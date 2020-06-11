@@ -1,0 +1,16 @@
+{
+    "id": "{015B8408-6B7F-0ABD-AA0B-3EF0893C8C4C}",
+    "name": "Ondilo Configurator",
+    "type": 4,
+    "vendor": "Ondilo",
+    "aliases": [
+        "Ondilo ICO Configurator"
+    ],
+    "parentRequirements": ["{58908109-E534-70C0-8A94-8FAABEEBFC6C}"],
+    "childRequirements": [],
+    "implemented": [
+        "{9FBA7489-CF87-05C7-012B-DD1241B3FCB1}"
+    ],
+    "prefix": "ONDILO",
+    "url": "https://github.com/Wolbolar/IPSymconOndilo"
+}

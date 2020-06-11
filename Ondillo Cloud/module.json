@@ -1,0 +1,18 @@
+{
+    "id": "{703B7E3E-5531-71FA-5905-AE11110DDD7E}",
+    "name": "Ondilo Cloud",
+    "type": 1,
+    "vendor": "Ondilo",
+    "aliases": [
+        "Ondilo ICO Cloud"
+    ],
+    "parentRequirements": [],
+    "childRequirements": [
+        "{9FBA7489-CF87-05C7-012B-DD1241B3FCB1}"
+    ],
+    "implemented": [
+        "{13683E92-8B41-A54D-BFE4-6496AAFC7FF5}", "{58908109-E534-70C0-8A94-8FAABEEBFC6C}"
+    ],
+    "prefix": "ONDILO",
+    "url": "https://github.com/Wolbolar/IPSymconOndilo"
+}

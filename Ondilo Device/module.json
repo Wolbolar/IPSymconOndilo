@@ -1,0 +1,18 @@
+{
+    "id": "{78C7A7D8-6E03-E200-7E9C-11B47D1A50DE}",
+    "name": "Ondilo Device",
+    "type": 3,
+    "vendor": "Ondilo",
+    "aliases": [
+        "Ondilo ICO Device"
+    ],
+    "parentRequirements": [
+        "{13683E92-8B41-A54D-BFE4-6496AAFC7FF5}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{9FBA7489-CF87-05C7-012B-DD1241B3FCB1}"
+    ],
+    "prefix": "ONDILO",
+    "url": "https://github.com/Wolbolar/IPSymconOndilo"
+}
