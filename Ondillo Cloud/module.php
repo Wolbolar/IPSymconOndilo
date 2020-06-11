@@ -33,7 +33,7 @@ class OndiloCloud extends IPSModule
         parent::Create();
 
         $this->RegisterPropertyInteger("UpdateInterval", 15);
-        $this->RegisterTimer("Update", 0, "GARDENA_Update(" . $this->InstanceID . ");");
+        $this->RegisterTimer("Update", 0, "ONDILO_Update(" . $this->InstanceID . ");");
         $this->RegisterAttributeString('Token', '');
 
         $this->RegisterAttributeString('user_lastname', '');
@@ -109,22 +109,29 @@ class OndiloCloud extends IPSModule
     {
         $this->GetUserInformationData();
         $this->GetUserUnitsData();
-        /*
-        $snapshot = $this->RequestSnapshot();
-
-        $this->SendDebug('Send Snapshot', $snapshot, 0);
-        $this->SendDataToChildren(json_encode(Array("DataID" => "{9FBA7489-CF87-05C7-012B-DD1241B3FCB1}", "Buffer" => $snapshot)));
-        return $snapshot;
-        */
+        $list_of_pools_json = $this->GetListPools();
+        $list_of_pools = json_decode($list_of_pools_json);
+        if($list_of_pools != false)
+        {
+            foreach($list_of_pools as $key => $pool)
+            {
+                $pool_id = $pool->id;
+                $pool_name = $pool->name;
+                $this->SendDebug('Ondlio Pool', $pool_name. ', ID: ' . $pool_id, 0);
+                $last_measure = $this->GetLastMeasureData($pool_id);
+                $this->SendDebug('Send Last Measure Pool' .$pool_name. ', ID: ' . $pool_id, json_encode($last_measure), 0);
+                $this->SendDataToChildren(json_encode(Array("DataID" => "{9FBA7489-CF87-05C7-012B-DD1241B3FCB1}", "Buffer" => $last_measure)));
+            }
+        }
     }
 
-    private function SetOndiloInterval($gardena_interval): void
+    private function SetOndiloInterval($ondilo_interval): void
     {
-        if($gardena_interval < 15 && $gardena_interval != 0)
+        if($ondilo_interval < 15 && $ondilo_interval != 0)
         {
-            $gardena_interval = 15;
+            $ondilo_interval = 15;
         }
-        $interval     = $gardena_interval * 1000  * 60; // minutes
+        $interval     = $ondilo_interval * 1000  * 60; // minutes
         $this->SetTimerInterval('Update', $interval);
     }
 
@@ -338,7 +345,7 @@ class OndiloCloud extends IPSModule
         }
         if($result == '{"message":"Limit Exceeded"}')
         {
-            $this->SendDebug('Gardena API', 'Limit Exceeded', 0);
+            $this->SendDebug('Ondilo API', 'Limit Exceeded', 0);
         }
         return $response;
     }
@@ -494,17 +501,6 @@ class OndiloCloud extends IPSModule
     "serial_number": "SN00001",
     "sw_version": "1.5.1-stable"
 }';
-
-        $pool_device = json_decode($pool_device_json);
-        if($pool_device != false)
-        {
-            $uuid = $pool_device->uuid;
-            $this->SendDebug('Ondlio Pool uuid', $uuid, 0);
-            $serial_number = $pool_device->serial_number;
-            $this->SendDebug('Ondlio ICO serial_number', $serial_number, 0);
-            $sw_version = $pool_device->sw_version;
-            $this->SendDebug('Ondlio software version', $sw_version, 0);
-        }
         return $pool_device_json;
     }
 
@@ -551,7 +547,7 @@ class OndiloCloud extends IPSModule
     /** Last measure
      * @return string
      */
-    private function GetLastMeasureData(string $pool_id)
+    private function GetLastMeasureData($pool_id)
     {
         // $last_measure = $this->FetchData(self::ONDILO_URL . self::POOLS . $pool_id . self::LAST_MEASURES);
         $last_measure = '[
@@ -584,6 +580,7 @@ class OndiloCloud extends IPSModule
         "exclusion_reason": null
     }
 ]';
+        $last_measure = json_decode($last_measure);
         return $last_measure;
     }
 
@@ -815,7 +812,7 @@ class OndiloCloud extends IPSModule
     protected function FormHead()
     {
         $visibility_register = false;
-        //Check Gardena connection
+        //Check Ondilo connection
         if ($this->ReadAttributeString('Token') == '') {
             $visibility_register = true;
         }

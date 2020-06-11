@@ -34,7 +34,7 @@ class OndiloDevice extends IPSModule
         $this->RegisterAttributeBoolean('uuid_enabled', false);
         $this->RegisterAttributeString('serial_number', '');
         $this->RegisterAttributeBoolean('serial_number_enabled', false);
-        $this->RegisterPropertyString('sw_version', '');
+        $this->RegisterAttributeString('sw_version', '');
         $this->RegisterAttributeBoolean('sw_version_enabled', false);
         $this->RegisterAttributeString('user_lastname', '');
         $this->RegisterAttributeString('user_firstname', '');
@@ -151,35 +151,37 @@ class OndiloDevice extends IPSModule
             'serial_number', $this->Translate('serial number'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
         );
         $temperature_ass = [
-            [15, $this->Translate("cold"), "", 255],
-            [28, $this->Translate("ok"), "", 65280],
-            [50, $this->Translate("hot"), "", 16711680]];
+            [15.0, $this->Translate("cold"). ' %.1f', "", 255],
+            [28.0, $this->Translate("ok"). ' %.1f', "", 65280],
+            [50.0, $this->Translate("hot"). ' %.1f', "", 16711680]];
         $this->RegisterProfileAssociation('Ondilo.Temperature', 'Temperature', '', ' °C', 0, 50, 1, 1, VARIABLETYPE_FLOAT, $temperature_ass);
         // todo temperature profile
         $this->SetupVariable(
             'temperature', $this->Translate('temperature'), '~Temperature', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
         );
-        $this->SetupVariable(
+        $objid = $this->SetupVariable(
             'temperature_time', $this->Translate('temperature time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
         );
+        IPS_SetIcon($objid, 'Clock');
         $this->SetupVariable(
             'temperature_is_valid', $this->Translate('temperature is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
         // todo orp profile
         /*
         $orp_ass = [
-            [650, $this->Translate("low"), "", 255],
-            [750, $this->Translate("ok"), "", 65280],
-            [5000, $this->Translate("high"), "", 16711680]];
+            [650, $this->Translate("low"). ' %d', "", 255],
+            [750, $this->Translate("ok"). ' %d', "", 65280],
+            [5000, $this->Translate("high"). ' %d', "", 16711680]];
         $this->RegisterProfileAssociation('Ondilo.ORP', 'DoctorBag', '', ' mV', 0, 5000, 10, 0, VARIABLETYPE_INTEGER, $orp_ass);
         */
         $this->RegisterProfile('Ondilo.ORP', 'DoctorBag', '', ' mV', 0, 5000, 10, 0, VARIABLETYPE_INTEGER);
         $this->SetupVariable(
             'orp', $this->Translate('redox potential'), 'Ondilo.ORP', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
         );
-        $this->SetupVariable(
+        $objid = $this->SetupVariable(
             'orp_time', $this->Translate('orp time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
         );
+        IPS_SetIcon($objid, 'Clock');
         $this->SetupVariable(
             'orp_is_valid', $this->Translate('orp is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
@@ -191,9 +193,10 @@ class OndiloDevice extends IPSModule
         $this->SetupVariable(
             'tds', $this->Translate('tds'), 'Ondilo.TDS', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
         );
-        $this->SetupVariable(
+        $objid = $this->SetupVariable(
             'tds_time', $this->Translate('tds time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
         );
+        IPS_SetIcon($objid, 'Clock');
         $this->SetupVariable(
             'tds_is_valid', $this->Translate('tds is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
@@ -205,11 +208,12 @@ class OndiloDevice extends IPSModule
         $this->SetupVariable(
             'ph', $this->Translate('pH'), 'Ondilo.pH', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
         );
-        $this->SetupVariable(
-            'ph_time', $this->Translate('temperature time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+        $objid = $this->SetupVariable(
+            'ph_time', $this->Translate('pH time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
         );
+        IPS_SetIcon($objid, 'Clock');
         $this->SetupVariable(
-            'ph_is_valid', $this->Translate('temperature is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
+            'ph_is_valid', $this->Translate('pH is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
         $this->SetupVariable(
             'uuid', $this->Translate('uuid'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
@@ -364,6 +368,16 @@ class OndiloDevice extends IPSModule
         */
     }
 
+    public function ReadPoolInformation()
+    {
+        $this->GetUserInformation();
+        $this->GetUserUnits();
+        $this->GetPoolConfiguration();
+        $this->GetPoolDevice();
+        $this->GetPoolShares();
+        $this->GetLastMeasure();
+    }
+
     /** User information
      * @return string
      */
@@ -405,28 +419,28 @@ class OndiloDevice extends IPSModule
         $user_units = json_decode($user_units_json);
         if ($user_units != false) {
             $conductivity = $user_units->conductivity;
-            $this->SendDebug('Ondlio conductivity', $conductivity, 0);
+            $this->SendDebug('Ondilo conductivity', $conductivity, 0);
             $this->WriteAttributeString('unit_conductivity', $conductivity);
             $hardness = $user_units->hardness;
-            $this->SendDebug('Ondlio hardness', $hardness, 0);
+            $this->SendDebug('Ondilo hardness', $hardness, 0);
             $this->WriteAttributeString('unit_hardness', $hardness);
             $orp = $user_units->orp;
-            $this->SendDebug('Ondlio orp', $orp, 0);
+            $this->SendDebug('Ondilo orp', $orp, 0);
             $this->WriteAttributeString('unit_orp', $orp);
             $pressure = $user_units->pressure;
-            $this->SendDebug('Ondlio pressure', $pressure, 0);
+            $this->SendDebug('Ondilo pressure', $pressure, 0);
             $this->WriteAttributeString('unit_pressure', $pressure);
             $salt = $user_units->salt;
-            $this->SendDebug('Ondlio salt', $salt, 0);
+            $this->SendDebug('Ondilo salt', $salt, 0);
             $this->WriteAttributeString('unit_salt', $salt);
             $speed = $user_units->speed;
-            $this->SendDebug('Ondlio speed', $speed, 0);
+            $this->SendDebug('Ondilo speed', $speed, 0);
             $this->WriteAttributeString('unit_speed', $speed);
             $temperature = $user_units->temperature;
-            $this->SendDebug('Ondlio temperature', $temperature, 0);
+            $this->SendDebug('Ondilo temperature', $temperature, 0);
             $this->WriteAttributeString('unit_temperature', $temperature);
             $volume = $user_units->volume;
-            $this->SendDebug('Ondlio volume', $volume, 0);
+            $this->SendDebug('Ondilo volume', $volume, 0);
             $this->WriteAttributeString('unit_volume', $volume);
             $this->WriteAttributeString('user_units', json_encode($user_units));
         }
@@ -436,49 +450,70 @@ class OndiloDevice extends IPSModule
     /** Pool/spa configuration
      * @return string
      */
-    public function GetPoolConfiguration(string $pool_id)
+    public function GetPoolConfiguration()
     {
         $pool_configuration_json = $this->RequestStatus('GetPoolConfiguration');
         $pool_configuration = json_decode($pool_configuration_json);
         if ($pool_configuration != false) {
             $temperature_low = $pool_configuration->temperature_low;
-            $this->SendDebug('Ondlio temperature low', $temperature_low, 0);
+            $this->SendDebug('Ondilo temperature low', $temperature_low, 0);
             $this->WriteAttributeInteger('temperature_low', $temperature_low);
             $temperature_high = $pool_configuration->temperature_high;
-            $this->SendDebug('Ondlio temperature high', $temperature_high, 0);
+            $this->SendDebug('Ondilo temperature high', $temperature_high, 0);
             $this->WriteAttributeInteger('temperature_high', $temperature_high);
             $ph_low = $pool_configuration->ph_low;
-            $this->SendDebug('Ondlio ph low', $ph_low, 0);
+            $this->SendDebug('Ondilo ph low', $ph_low, 0);
             $this->WriteAttributeFloat('ph_low', $ph_low);
             $ph_high = $pool_configuration->ph_high;
-            $this->SendDebug('Ondlio ph high', $ph_high, 0);
+            $this->SendDebug('Ondilo ph high', $ph_high, 0);
             $this->WriteAttributeFloat('ph_high', $ph_high);
             $orp_low = $pool_configuration->orp_low;
-            $this->SendDebug('Ondlio orp low', $orp_low, 0);
+            $this->SendDebug('Ondilo orp low', $orp_low, 0);
             $this->WriteAttributeInteger('orp_low', $orp_low);
             $orp_high = $pool_configuration->orp_high;
-            $this->SendDebug('Ondlio orp high', $orp_high, 0);
+            $this->SendDebug('Ondilo orp high', $orp_high, 0);
             $this->WriteAttributeInteger('orp_high', $orp_high);
             $salt_low = $pool_configuration->salt_low;
-            $this->SendDebug('Ondlio salt low', $salt_low, 0);
+            $this->SendDebug('Ondilo salt low', $salt_low, 0);
             $this->WriteAttributeInteger('salt_low', $salt_low);
             $salt_high = $pool_configuration->salt_high;
-            $this->SendDebug('Ondlio salt high', $salt_high, 0);
+            $this->SendDebug('Ondilo salt high', $salt_high, 0);
             $this->WriteAttributeInteger('salt_high', $salt_high);
             $tds_low = $pool_configuration->tds_low;
-            $this->SendDebug('Ondlio tds low', $tds_low, 0);
+            $this->SendDebug('Ondilo tds low', $tds_low, 0);
             $this->WriteAttributeInteger('tds_low', $tds_low);
             $tds_high = $pool_configuration->tds_high;
-            $this->SendDebug('Ondlio tds high', $tds_high, 0);
+            $this->SendDebug('Ondilo tds high', $tds_high, 0);
             $this->WriteAttributeInteger('tds_high', $tds_high);
             $pool_guy_number = $pool_configuration->pool_guy_number;
-            $this->SendDebug('Ondlio pool guy number', $pool_guy_number, 0);
+            $this->SendDebug('Ondilo pool guy number', $pool_guy_number, 0);
             $this->WriteAttributeInteger('pool_guy_number', $pool_guy_number);
             $maintenance_day = $pool_configuration->maintenance_day;
-            $this->SendDebug('Ondlio maintenance_day', $maintenance_day, 0);
+            $this->SendDebug('Ondilo maintenance_day', $maintenance_day, 0);
             $this->WriteAttributeInteger('maintenance_day', $maintenance_day);
         }
         return $pool_configuration_json;
+    }
+
+    /** Pool/spa device
+     * @return string
+     */
+    public function GetPoolDevice()
+    {
+        $pool_device_json = $this->RequestStatus('GetPoolDevice');
+        $pool_device = json_decode($pool_device_json);
+        if ($pool_device != false) {
+            $uuid = $pool_device->uuid;
+            $this->SendDebug('Ondilo Pool uuid', $uuid, 0);
+            $this->WriteAttributeString('uuid', $uuid);
+            $serial_number = $pool_device->serial_number;
+            $this->SendDebug('Ondilo ICO serial_number', $serial_number, 0);
+            $this->WriteAttributeString('serial_number', $serial_number);
+            $sw_version = $pool_device->sw_version;
+            $this->SendDebug('Ondilo software version', $sw_version, 0);
+            $this->WriteAttributeString('sw_version', $sw_version);
+        }
+        return $pool_device_json;
     }
 
     /** Pool/spa shares
@@ -491,13 +526,13 @@ class OndiloDevice extends IPSModule
         if ($pool_shares != false) {
             foreach ($pool_shares as $key => $pool) {
                 $lastname = $pool_shares->lastname;
-                $this->SendDebug('Ondlio share lastname', $lastname, 0);
+                $this->SendDebug('Ondilo share lastname', $lastname, 0);
                 $firstname = $pool_shares->firstname;
-                $this->SendDebug('Ondlio share firstname', $firstname, 0);
+                $this->SendDebug('Ondilo share firstname', $firstname, 0);
                 $email = $pool_shares->email;
-                $this->SendDebug('Ondlio share email', $email, 0);
+                $this->SendDebug('Ondilo share email', $email, 0);
                 $shared_since = $pool_shares->shared_since;
-                $this->SendDebug('Ondlio shared since', $shared_since, 0);
+                $this->SendDebug('Ondilo shared since', $shared_since, 0);
             }
             $this->WriteAttributeString('pool_shares', json_encode($pool_shares));
         }
@@ -511,38 +546,41 @@ class OndiloDevice extends IPSModule
     {
         $last_measure_json = $this->RequestStatus('GetLastMeasure');
         $last_measures = json_decode($last_measure_json);
-        if ($last_measures != false) {
-            foreach ($last_measures as $key => $last_measure) {
-                $data_type = $last_measure->data_type;
-                $value = $last_measure->value;
-                $value_time = $last_measure->value_time;
-                $is_valid = $last_measure->is_valid;
-                // $exclusion_reason = $last_measure->exclusion_reason;
-                if ($data_type == 'temperature') {
-                    $this->WriteAttributeFloat('temperature', $value);
-                    $this->WriteAttributeInteger('temperature_time', $this->CalculateTime($value_time, 'temperature'));
-                    $this->WriteAttributeBoolean('temperature_is_valid', $is_valid);
-                }
-                if ($data_type == 'orp') {
-                    $this->WriteAttributeInteger('orp', $value);
-                    $this->WriteAttributeInteger('orp_time', $this->CalculateTime($value_time, 'orp'));
-                    $this->WriteAttributeBoolean('orp_is_valid', $is_valid);
-                }
-                if ($data_type == 'tds') {
-                    $this->WriteAttributeInteger('tds', $value);
-                    $this->WriteAttributeInteger('tds_time', $this->CalculateTime($value_time, 'tds'));
-                    $this->WriteAttributeBoolean('tds_is_valid', $is_valid);
-                }
-                if ($data_type == 'ph') {
-                    $this->WriteAttributeFloat('ph', $value);
-                    $this->WriteAttributeInteger('ph_time', $this->CalculateTime($value_time, 'pH'));
-                    $this->WriteAttributeBoolean('ph_is_valid', $is_valid);
-                }
-                $this->SendDebug('Ondlio data', $data_type . ': ' . $value, 0);
+        $this->FetchLastMeasure($last_measures);
+        return $last_measure_json;
+    }
+
+    private function FetchLastMeasure($last_measures)
+    {
+        foreach ($last_measures as $key => $last_measure) {
+            $data_type = $last_measure->data_type;
+            $value = $last_measure->value;
+            $value_time = $last_measure->value_time;
+            $is_valid = $last_measure->is_valid;
+            // $exclusion_reason = $last_measure->exclusion_reason;
+            if ($data_type == 'temperature') {
+                $this->WriteAttributeFloat('temperature', $value);
+                $this->WriteAttributeInteger('temperature_time', $this->CalculateTime($value_time, 'temperature'));
+                $this->WriteAttributeBoolean('temperature_is_valid', $is_valid);
             }
+            if ($data_type == 'orp') {
+                $this->WriteAttributeInteger('orp', $value);
+                $this->WriteAttributeInteger('orp_time', $this->CalculateTime($value_time, 'orp'));
+                $this->WriteAttributeBoolean('orp_is_valid', $is_valid);
+            }
+            if ($data_type == 'tds') {
+                $this->WriteAttributeInteger('tds', $value);
+                $this->WriteAttributeInteger('tds_time', $this->CalculateTime($value_time, 'tds'));
+                $this->WriteAttributeBoolean('tds_is_valid', $is_valid);
+            }
+            if ($data_type == 'ph') {
+                $this->WriteAttributeFloat('ph', $value);
+                $this->WriteAttributeInteger('ph_time', $this->CalculateTime($value_time, 'pH'));
+                $this->WriteAttributeBoolean('ph_is_valid', $is_valid);
+            }
+            $this->SendDebug('Ondilo data', $data_type . ': ' . $value, 0);
         }
         $this->WriteValues();
-        return $last_measures;
     }
 
     private function CalculateTime($time_string, $subject)
@@ -554,10 +592,6 @@ class OndiloDevice extends IPSModule
         return $timestamp;
     }
 
-    /***********************************************************
-     * Configuration Form
-     ***********************************************************/
-
     /** Set of measures
      * @return string
      */
@@ -566,21 +600,21 @@ class OndiloDevice extends IPSModule
         $user_units = $this->RequestStatus('GetSetOfMeasures');
         if ($user_units != false) {
             $conductivity = $user_units->conductivity;
-            $this->SendDebug('Ondlio conductivity', $conductivity, 0);
+            $this->SendDebug('Ondilo conductivity', $conductivity, 0);
             $hardness = $user_units->hardness;
-            $this->SendDebug('Ondlio hardness', $hardness, 0);
+            $this->SendDebug('Ondilo hardness', $hardness, 0);
             $orp = $user_units->orp;
-            $this->SendDebug('Ondlio orp', $orp, 0);
+            $this->SendDebug('Ondilo orp', $orp, 0);
             $pressure = $user_units->pressure;
-            $this->SendDebug('Ondlio pressure', $pressure, 0);
+            $this->SendDebug('Ondilo pressure', $pressure, 0);
             $salt = $user_units->salt;
-            $this->SendDebug('Ondlio conductivity', $salt, 0);
+            $this->SendDebug('Ondilo conductivity', $salt, 0);
             $speed = $user_units->speed;
-            $this->SendDebug('Ondlio speed', $speed, 0);
+            $this->SendDebug('Ondilo speed', $speed, 0);
             $temperature = $user_units->temperature;
-            $this->SendDebug('Ondlio temperature', $temperature, 0);
+            $this->SendDebug('Ondilo temperature', $temperature, 0);
             $volume = $user_units->volume;
-            $this->SendDebug('Ondlio volume', $volume, 0);
+            $this->SendDebug('Ondilo volume', $volume, 0);
             $this->WriteAttributeString('user_units', $user_units);
         }
         return $user_units;
@@ -590,20 +624,14 @@ class OndiloDevice extends IPSModule
     {
         $data = json_decode($JSONString);
         $payload = $data->Buffer;
-        $this->SendDebug('Receive ICO data', $payload, 0);
-        if ($payload != '[]') {
-            $this->CheckDeviceData($payload);
-        }
+        $this->SendDebug('Receive ICO data', json_encode($payload), 0);
+        $this->CheckDeviceData($payload);
     }
 
     private function CheckDeviceData($data)
     {
-        $payload = json_decode($data, true);
         if (!empty($data)) {
-            /*
-
-            $this->WriteValues();
-            */
+            $this->FetchLastMeasure($data);
         }
     }
 
@@ -631,6 +659,10 @@ class OndiloDevice extends IPSModule
 
         $this->RegisterVariables();
     }
+
+    /***********************************************************
+     * Configuration Form
+     ***********************************************************/
 
     /**
      * build configuration form
@@ -682,13 +714,30 @@ class OndiloDevice extends IPSModule
                 [
                     'type' => 'Label',
                     'visible' => $visibility_serial,
+                    'label' => $this->Translate('software version') . ': '. $this->ReadAttributeString('sw_version')
+                ],
+                [
+                    'type' => 'Label',
+                    'visible' => $visibility_serial,
                     'label' => $this->Translate('uuid: ') . $this->ReadAttributeString('uuid')
                 ],
                 [
                     'type' => 'Label',
                     'visible' => false,
                     'label' => $this->Translate('pool id: ') . $this->Translate($this->ReadPropertyString('id'))
-                ]
+                ],
+                [
+                    'type' => 'RowLayout',
+                    'visible' => true,
+                    'items' => [
+                        [
+                            'type' => 'Label',
+                            'label' => $this->Translate('Owner:')
+                        ],
+                        [
+                            'type' => 'Label',
+                            'label' => $this->ReadAttributeString('user_firstname') . ' ' . $this->ReadAttributeString('user_lastname')  . ', (' . $this->ReadAttributeString('user_email') . ')'
+                        ],]],
             ];
         } else {
             $form = [
@@ -789,7 +838,13 @@ class OndiloDevice extends IPSModule
                 'caption' => 'pH is valid',
                 'visible' => true,
                 'value' => $this->ReadAttributeBoolean('ph_is_valid_enabled'),
-                'onChange' => 'Ondilo_SetWebFrontVariable($id, "ph_is_valid_enabled", $ph_is_valid_enabled);']
+                'onChange' => 'Ondilo_SetWebFrontVariable($id, "ph_is_valid_enabled", $ph_is_valid_enabled);'],
+            [
+                'type' => 'Button',
+                'visible' => true,
+                'caption' => 'Read Pool Information',
+                'onClick' => 'ONDILO_ReadPoolInformation($id);'
+            ]
         ];
         return $form;
     }
@@ -824,26 +879,5 @@ class OndiloDevice extends IPSModule
         ];
 
         return $form;
-    }
-
-    /** Pool/spa device
-     * @return string
-     */
-    private function GetPoolDevice()
-    {
-        $pool_device_json = $this->RequestStatus('GetPoolDevice');
-        $pool_device = json_decode($pool_device_json);
-        if ($pool_device != false) {
-            $uuid = $pool_device->uuid;
-            $this->SendDebug('Ondlio Pool uuid', $uuid, 0);
-            $this->WriteAttributeString('uuid', $uuid);
-            $serial_number = $pool_device->serial_number;
-            $this->SendDebug('Ondlio ICO serial_number', $serial_number, 0);
-            $this->WriteAttributeString('serial_number', $serial_number);
-            $sw_version = $pool_device->sw_version;
-            $this->SendDebug('Ondlio software version', $sw_version, 0);
-            $this->WriteAttributeString('sw_version', $sw_version);
-        }
-        return $pool_device_json;
     }
 }

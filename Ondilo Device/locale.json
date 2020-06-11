@@ -16,8 +16,8 @@
       "orp time": "ORP Zeit",
       "orp is valid": "ORP is gültig",
       "tds": "TDS",
-      "tds time": "Temperatur Zeit",
-      "tds is valid": "Temperatur ist gültig",
+      "tds time": "TDS Zeit",
+      "tds is valid": "TDS ist gültig",
       "pH": "pH",
       "pH time": "pH Zeit",
       "pH is valid": "pH ist gültig",
@@ -27,7 +27,9 @@
       "acidic": "sauer",
       "ok": "ok",
       "cold": "kalt",
-      "hot": "heiß"
+      "hot": "heiß",
+      "Owner:": "Besitzer:",
+      "Read Pool Information": "Poolinformation auslesen"
     },
     "de_AT": {
       "serial number: ": "Seriennummer: ",
@@ -56,7 +58,9 @@
       "acidic": "sauer",
       "ok": "ok",
       "cold": "kalt",
-      "hot": "heiß"
+      "hot": "heiß",
+      "Owner:": "Besitzer:",
+      "Read Pool Information": "Poolinformation auslesen"
     },
     "de_CH": {
       "serial number: ": "Seriennummer: ",
@@ -85,7 +89,9 @@
       "acidic": "sauer",
       "ok": "ok",
       "cold": "kalt",
-      "hot": "heiß"
+      "hot": "heiß",
+      "Owner:": "Besitzer:",
+      "Read Pool Information": "Poolinformation auslesen"
     },
     "fr": {
       "serial number: ": "numéro de série:",
@@ -114,7 +120,9 @@
       "acidic": "sauer",
       "ok": "ok",
       "cold": "kalt",
-      "hot": "heiß"
+      "hot": "heiß",
+      "Owner:": "Besitzer:",
+      "Read Pool Information": "Poolinformation auslesen"
     }
   }
 }
