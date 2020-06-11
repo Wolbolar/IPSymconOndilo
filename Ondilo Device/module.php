@@ -32,7 +32,7 @@ class OndiloDevice extends IPSModule
         $this->RegisterAttributeBoolean('name_enabled', false);
         $this->RegisterPropertyString('uuid', '');
         $this->RegisterAttributeBoolean('uuid_enabled', false);
-        $this->RegisterPropertyString('serial_number', '');
+        $this->RegisterAttributeString('serial_number', '');
         $this->RegisterAttributeBoolean('serial_number_enabled', false);
         $this->RegisterPropertyString('sw_version', '');
         $this->RegisterAttributeBoolean('sw_version_enabled', false);
