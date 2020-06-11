@@ -155,8 +155,9 @@ class OndiloDevice extends IPSModule
             [28, $this->Translate("ok"), "", 65280],
             [50, $this->Translate("hot"), "", 16711680]];
         $this->RegisterProfileAssociation('Ondilo.Temperature', 'Temperature', '', ' °C', 0, 50, 1, 1, VARIABLETYPE_FLOAT, $temperature_ass);
+        // todo temperature profile
         $this->SetupVariable(
-            'temperature', $this->Translate('temperature'), 'Ondilo.Temperature', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
+            'temperature', $this->Translate('temperature'), '~Temperature', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
         );
         $this->SetupVariable(
             'temperature_time', $this->Translate('temperature time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
@@ -164,11 +165,15 @@ class OndiloDevice extends IPSModule
         $this->SetupVariable(
             'temperature_is_valid', $this->Translate('temperature is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
+        // todo orp profile
+        /*
         $orp_ass = [
             [650, $this->Translate("low"), "", 255],
             [750, $this->Translate("ok"), "", 65280],
             [5000, $this->Translate("high"), "", 16711680]];
-        $this->RegisterProfileAssociation('Ondilo.ORP', 'TurnRight', '', ' mV', 0, 5000, 10, 0, VARIABLETYPE_INTEGER, $orp_ass);
+        $this->RegisterProfileAssociation('Ondilo.ORP', 'DoctorBag', '', ' mV', 0, 5000, 10, 0, VARIABLETYPE_INTEGER, $orp_ass);
+        */
+        $this->RegisterProfile('Ondilo.ORP', 'DoctorBag', '', ' mV', 0, 5000, 10, 0, VARIABLETYPE_INTEGER);
         $this->SetupVariable(
             'orp', $this->Translate('redox potential'), 'Ondilo.ORP', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
         );
@@ -179,9 +184,9 @@ class OndiloDevice extends IPSModule
             'orp_is_valid', $this->Translate('orp is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
         $tds_ass = [
-            [200, $this->Translate("low"), "", 255],
-            [250, $this->Translate("ok"), "", 65280],
-            [5000, $this->Translate("high"), "", 16711680]];
+            [200, $this->Translate("low"). ' %d', "", 255],
+            [250, $this->Translate("ok"). ' %d', "", 65280],
+            [5000, $this->Translate("high") . ' %d', "", 16711680]];
         $this->RegisterProfileAssociation('Ondilo.TDS', 'Snow', '', ' ppm', 0, 5000, 10, 0, VARIABLETYPE_INTEGER, $tds_ass);
         $this->SetupVariable(
             'tds', $this->Translate('tds'), 'Ondilo.TDS', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
@@ -193,9 +198,9 @@ class OndiloDevice extends IPSModule
             'tds_is_valid', $this->Translate('tds is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
         $ph_ass = [
-            [6.8, $this->Translate("acidic"), "", 16711680],
-            [7.4, $this->Translate("ok"), "", 65280],
-            [14, $this->Translate("alkaline"), "", 255]];
+            [6.8, $this->Translate("acidic"). ' %.1f', "", 16711680],
+            [7.4, $this->Translate("ok"). ' %.1f', "", 65280],
+            [14, $this->Translate("alkaline"). ' %.1f', "", 255]];
         $this->RegisterProfileAssociation('Ondilo.pH', 'Gauge', '', '', 0, 14, 1, 1, VARIABLETYPE_FLOAT, $ph_ass);
         $this->SetupVariable(
             'ph', $this->Translate('pH'), 'Ondilo.pH', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
