@@ -22,7 +22,12 @@
       "pH time": "pH Zeit",
       "pH is valid": "pH ist gültig",
       "pool id: ": "Pool ID: ",
-      "software version": "Software Version"
+      "software version": "Software Version",
+      "alkaline": "alkalisch",
+      "acidic": "sauer",
+      "ok": "ok",
+      "cold": "kalt",
+      "hot": "heiß"
     },
     "de_AT": {
       "serial number: ": "Seriennummer: ",
@@ -46,7 +51,12 @@
       "pH time": "pH Zeit",
       "pH is valid": "pH ist gültig",
       "pool id: ": "Pool ID: ",
-      "software version": "Software Version"
+      "software version": "Software Version",
+      "alkaline": "alkalisch",
+      "acidic": "sauer",
+      "ok": "ok",
+      "cold": "kalt",
+      "hot": "heiß"
     },
     "de_CH": {
       "serial number: ": "Seriennummer: ",
@@ -70,7 +80,12 @@
       "pH time": "pH Zeit",
       "pH is valid": "pH ist gültig",
       "pool id: ": "Pool ID: ",
-      "software version": "Software Version"
+      "software version": "Software Version",
+      "alkaline": "alkalisch",
+      "acidic": "sauer",
+      "ok": "ok",
+      "cold": "kalt",
+      "hot": "heiß"
     },
     "fr": {
       "serial number: ": "numéro de série:",
@@ -94,7 +109,12 @@
       "pH time": "pH temps",
       "pH is valid": "pH est valide",
       "pool id: ": "identifiant de pool: ",
-      "software version": "une version de logiciel"
+      "software version": "une version de logiciel",
+      "alkaline": "alkalisch",
+      "acidic": "sauer",
+      "ok": "ok",
+      "cold": "kalt",
+      "hot": "heiß"
     }
   }
 }
