@@ -177,8 +177,7 @@ class OndiloCloud extends IPSModule
     {
 
         //Return everything which will open the browser
-        // return 'https://oauth.ipmagic.de/authorize/' . $this->oauthIdentifer . '?username=' . urlencode(IPS_GetLicensee());
-        return 'https://interop.ondilo.com/oauth2/authorize?client_id=customer_api&response_type=code&redirect_uri=https%3A%2F%2F6971ba3a53bc72a80996d029cf823dfc.ipmagic.de%2Fhook%2Fondilo&scope=api&state=wbo7hrlmlc';
+        return 'https://oauth.ipmagic.de/authorize/' . $this->oauthIdentifer . '?username=' . urlencode(IPS_GetLicensee()); // todo autorization scope error
     }
 
     /** Exchange our Authentication Code for a permanent Refresh Token and a temporary Access Token
