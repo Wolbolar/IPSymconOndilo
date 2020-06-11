@@ -16,13 +16,20 @@
       "orp time": "ORP Zeit",
       "orp is valid": "ORP is gültig",
       "tds": "TDS",
-      "tds time": "Temperatur Zeit",
-      "tds is valid": "Temperatur ist gültig",
+      "tds time": "TDS Zeit",
+      "tds is valid": "TDS ist gültig",
       "pH": "pH",
       "pH time": "pH Zeit",
       "pH is valid": "pH ist gültig",
       "pool id: ": "Pool ID: ",
-      "software version": "Software Version"
+      "software version": "Software Version",
+      "alkaline": "alkalisch",
+      "acidic": "sauer",
+      "ok": "ok",
+      "cold": "kalt",
+      "hot": "heiß",
+      "Owner:": "Besitzer:",
+      "Read Pool Information": "Poolinformation auslesen"
     },
     "de_AT": {
       "serial number: ": "Seriennummer: ",
@@ -46,7 +53,14 @@
       "pH time": "pH Zeit",
       "pH is valid": "pH ist gültig",
       "pool id: ": "Pool ID: ",
-      "software version": "Software Version"
+      "software version": "Software Version",
+      "alkaline": "alkalisch",
+      "acidic": "sauer",
+      "ok": "ok",
+      "cold": "kalt",
+      "hot": "heiß",
+      "Owner:": "Besitzer:",
+      "Read Pool Information": "Poolinformation auslesen"
     },
     "de_CH": {
       "serial number: ": "Seriennummer: ",
@@ -70,7 +84,14 @@
       "pH time": "pH Zeit",
       "pH is valid": "pH ist gültig",
       "pool id: ": "Pool ID: ",
-      "software version": "Software Version"
+      "software version": "Software Version",
+      "alkaline": "alkalisch",
+      "acidic": "sauer",
+      "ok": "ok",
+      "cold": "kalt",
+      "hot": "heiß",
+      "Owner:": "Besitzer:",
+      "Read Pool Information": "Poolinformation auslesen"
     },
     "fr": {
       "serial number: ": "numéro de série:",
@@ -94,7 +115,14 @@
       "pH time": "pH temps",
       "pH is valid": "pH est valide",
       "pool id: ": "identifiant de pool: ",
-      "software version": "une version de logiciel"
+      "software version": "une version de logiciel",
+      "alkaline": "alkalisch",
+      "acidic": "sauer",
+      "ok": "ok",
+      "cold": "kalt",
+      "hot": "heiß",
+      "Owner:": "Besitzer:",
+      "Read Pool Information": "Poolinformation auslesen"
     }
   }
 }
