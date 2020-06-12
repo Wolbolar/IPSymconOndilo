@@ -545,9 +545,10 @@ class OndiloDevice extends IPSModule
     public function GetLastMeasure()
     {
         $last_measure_json = $this->RequestStatus('GetLastMeasure');
-        $last_measures = json_decode($last_measure_json);
-        $this->FetchLastMeasure($last_measures);
-        return $last_measure_json;
+        $this->SendDebug('Receive ICO data', $last_measure_json, 0);
+        $last_measure = json_decode($last_measure_json);
+        $this->FetchLastMeasure($last_measure);
+        return $last_measure;
     }
 
     private function FetchLastMeasure($last_measures)
