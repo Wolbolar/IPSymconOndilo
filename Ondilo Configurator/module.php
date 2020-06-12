@@ -179,32 +179,7 @@ class OndiloConfigurator extends IPSModule
     private function Get_ListConfiguration()
     {
         $config_list = [];
-        // $list_pools = $this->RequestDataFromParent('GetListPools');
-        $list_pools = '[
-    {
-        "id": 234,
-        "name": "John\'s Pool",
-        "type": "outdoor_inground_pool",
-        "volume": 15,
-        "disinfection": {
-            "primary": "chlorine",
-            "secondary": {
-                "uv_sanitizer": true,
-                "ozonator": false
-            }
-        },
-        "address": {
-            "street": "162 Avenue Robert Schuman",
-            "zipcode": "13760",
-            "city": "Saint-Cannat",
-            "country": "France",
-            "latitude": 43.612282,
-            "longitude": 5.3179397
-        },
-        "updated_at": "2019-11-27T23:00:21+0000"
-    }
-]';
-
+        $list_pools = $this->RequestDataFromParent('GetListPools');
         if ($list_pools != '') {
             $OndiloInstanceIDList = IPS_GetInstanceListByModuleID('{78C7A7D8-6E03-E200-7E9C-11B47D1A50DE}'); // Ondilo Devices
             $payload = json_decode($list_pools);

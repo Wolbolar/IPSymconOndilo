@@ -6,11 +6,10 @@ class OndiloCloud extends IPSModule
     private $oauthIdentifer = 'ondilo';
 
     // Ondilo API
-    private const ONDILO_URL = 'https://interop.ondilo.com/api/customer/v1';
+    private const ONDILO_URL = 'https://interop.ondilo.com';
     private const USER_INFORMATION = '/api/customer/v1/user/info';
     private const USER_UNITS = '/api/customer/v1/user/units';
     private const LIST_POOLS = '/api/customer/v1/pools';
-    private const POOLS = '/pools/';
     private const DEVICE = '/device';
     private const CONFIGURATION = '/configuration';
     private const SHARES = '/shares';
@@ -118,7 +117,7 @@ class OndiloCloud extends IPSModule
                 $pool_id = $pool->id;
                 $pool_name = $pool->name;
                 $this->SendDebug('Ondlio Pool', $pool_name. ', ID: ' . $pool_id, 0);
-                $last_measure = $this->GetLastMeasureData($pool_id);
+                $last_measure = json_decode($this->GetLastMeasureData($pool_id));
                 $this->SendDebug('Send Last Measure Pool' .$pool_name. ', ID: ' . $pool_id, json_encode($last_measure), 0);
                 $this->SendDataToChildren(json_encode(Array("DataID" => "{9FBA7489-CF87-05C7-012B-DD1241B3FCB1}", "Buffer" => $last_measure)));
             }
@@ -177,7 +176,7 @@ class OndiloCloud extends IPSModule
     {
 
         //Return everything which will open the browser
-        return 'https://oauth.ipmagic.de/authorize/' . $this->oauthIdentifer . '?username=' . urlencode(IPS_GetLicensee()); // todo autorization scope error
+        return 'https://oauth.ipmagic.de/authorize/' . $this->oauthIdentifer . '?username=' . urlencode(IPS_GetLicensee());
     }
 
     /** Exchange our Authentication Code for a permanent Refresh Token and a temporary Access Token
@@ -188,7 +187,9 @@ class OndiloCloud extends IPSModule
     private function FetchRefreshToken($code)
     {
         $this->SendDebug('FetchRefreshToken', 'Use Authentication Code to get our precious Refresh Token!', 0);
-        $options = [
+        $this->SendDebug('Recieved Authentication Code', $code, 0);
+
+         $options = [
             'http' => [
                 'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
                 'method' => 'POST',
@@ -297,7 +298,7 @@ class OndiloCloud extends IPSModule
         $opts = array(
             "http" => array(
                 "method" => "GET",
-                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nAuthorization-Provider: husqvarna\r\nX-Api-Key: " . self::APIKEY . "\r\n",
+                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nAccept: application/json\r\nAccept-Charset: utf-8\r\nAccept-Encoding: gzip, deflate\r\n",
                 "ignore_errors" => true
             )
         );
@@ -320,27 +321,27 @@ class OndiloCloud extends IPSModule
         }
         elseif((strpos($http_error, '400') > 0)) {
             $this->SendDebug('HTTP Response Header', 'There is a problem with some data sent in the request. An error response body shall clarify the issue. Response Body: ' . $result, 0);
-            $response =  false;
+            $response =  '[]';
         }
         elseif((strpos($http_error, '401') > 0)) {
             $this->SendDebug('HTTP Response Header', 'The access token sent in the header is invalid. You should call the refresh token endpoint of the Ondilo authentication service. Response Body: ' . $result, 0);
-            $response =  false;
+            $response =  '[]';
         }
         elseif((strpos($http_error, '404') > 0)) {
             $this->SendDebug('HTTP Response Header', 'You are trying to reach a page that doesn\'t exist. Response Body: ' . $result, 0);
-            $response =  false;
+            $response =  '[]';
         }
         elseif((strpos($http_error, '500') > 0)) {
             $this->SendDebug('HTTP Response Header', 'An error in the Ondilo Customer API application logic has been detected. An error response body shall clarify the issue. Response Body: ' . $result, 0);
-            $response =  false;
+            $response =  '[]';
         }
         elseif((strpos($http_error, '503') > 0)) {
             $this->SendDebug('HTTP Response Header', 'The Ondilo Customer API is not currently available. You should try again later. Response Body: ' . $result, 0);
-            $response =  false;
+            $response =  '[]';
         }
         else{
             $this->SendDebug('HTTP Response Header', $http_error . ' Response Body: ' . $result, 0);
-            $response =  false;
+            $response =  '[]';
         }
         if($result == '{"message":"Limit Exceeded"}')
         {
@@ -358,12 +359,7 @@ class OndiloCloud extends IPSModule
      */
     private function GetUserInformationData()
     {
-        // $user_info_json = $this->FetchData(self::ONDILO_URL . self::USER_INFORMATION);
-        $user_info_json = '{
-    "lastname": "Doe",
-    "firstname": "John",
-    "email": "john@doe.org"
-}';
+        $user_info_json = $this->FetchData(self::ONDILO_URL . self::USER_INFORMATION);
         $user_info = json_decode($user_info_json);
         if($user_info != false)
         {
@@ -382,17 +378,7 @@ class OndiloCloud extends IPSModule
      */
     private function GetUserUnitsData()
     {
-        // $user_units = $this->FetchData(self::ONDILO_URL . self::USER_UNITS);
-        $user_units_json = '{
-    "conductivity": "MICRO_SIEMENS_PER_CENTI_METER",
-    "hardness": "FRENCH_DEGREE",
-    "orp": "MILLI_VOLT",
-    "pressure": "HECTO_PASCAL",
-    "salt": "GRAM_PER_LITER",
-    "speed": "METER_PER_SECOND",
-    "temperature": "CELSIUS",
-    "volume": "CUBIC_METER"
-}';
+        $user_units_json = $this->FetchData(self::ONDILO_URL . self::USER_UNITS);
         $user_units = json_decode($user_units_json);
         if($user_units != false)
         {
@@ -432,32 +418,7 @@ class OndiloCloud extends IPSModule
      */
     public function GetListPools()
     {
-        // $list_of_pools = $this->FetchData(self::ONDILO_URL . self::LIST_POOLS);
-        $list_of_pools_json = '[
-    {
-        "id": 234,
-        "name": "John\'s Pool",
-        "type": "outdoor_inground_pool",
-        "volume": 15,
-        "disinfection": {
-            "primary": "chlorine",
-            "secondary": {
-                "uv_sanitizer": true,
-                "ozonator": false
-            }
-        },
-        "address": {
-            "street": "162 Avenue Robert Schuman",
-            "zipcode": "13760",
-            "city": "Saint-Cannat",
-            "country": "France",
-            "latitude": 43.612282,
-            "longitude": 5.3179397
-        },
-        "updated_at": "2019-11-27T23:00:21+0000"
-    }
-]';
-
+        $list_of_pools_json = $this->FetchData(self::ONDILO_URL . self::LIST_POOLS);
         $list_of_pools = json_decode($list_of_pools_json);
         if($list_of_pools != false)
         {
@@ -466,24 +427,6 @@ class OndiloCloud extends IPSModule
                 $id = $pool->id;
                 $this->SendDebug('Ondlio Pool ID', $id, 0);
             }
-            /*
-            $conductivity = $list_of_pools->conductivity;
-            $this->SendDebug('Ondlio conductivity', $conductivity, 0);
-            $hardness = $list_of_pools->hardness;
-            $this->SendDebug('Ondlio hardness', $hardness, 0);
-            $orp = $list_of_pools->orp;
-            $this->SendDebug('Ondlio orp', $orp, 0);
-            $pressure = $list_of_pools->pressure;
-            $this->SendDebug('Ondlio pressure', $pressure, 0);
-            $salt = $list_of_pools->salt;
-            $this->SendDebug('Ondlio conductivity', $salt, 0);
-            $speed = $list_of_pools->speed;
-            $this->SendDebug('Ondlio speed', $speed, 0);
-            $temperature = $list_of_pools->temperature;
-            $this->SendDebug('Ondlio temperature', $temperature, 0);
-            $volume = $list_of_pools->volume;
-            $this->SendDebug('Ondlio volume', $volume, 0);
-            */
             $this->WriteAttributeString('list_pools', json_encode($list_of_pools));
         }
         return $list_of_pools_json;
@@ -494,13 +437,7 @@ class OndiloCloud extends IPSModule
      */
     private function GetPoolDeviceData(string $pool_id)
     {
-        // $pool_device_json = $this->FetchData(self::ONDILO_URL . self::POOLS . $pool_id . self::DEVICE);
-        $pool_device_json = '{
-    "uuid": "1234567890ABCDEF",
-    "serial_number": "SN00001",
-    "sw_version": "1.5.1-stable"
-}';
-        return $pool_device_json;
+        return $this->FetchData(self::ONDILO_URL . self::LIST_POOLS . '/' . $pool_id . self::DEVICE);
     }
 
     /** Pool/spa configuration
@@ -508,22 +445,7 @@ class OndiloCloud extends IPSModule
      */
     private function GetPoolConfigurationData(string $pool_id)
     {
-        // $pool_configuration_json = $this->FetchData(self::ONDILO_URL . self::POOLS . $pool_id . self::CONFIGURATION);
-        $pool_configuration_json = '{
-    "temperature_low": 10,
-    "temperature_high": 30,
-    "ph_low": 7.6,
-    "ph_high": 8.5,
-    "orp_low": 400,
-    "orp_high": 900,
-    "salt_low": 3000,
-    "salt_high": 5000,
-    "tds_low": 250,
-    "tds_high": 2000,
-    "pool_guy_number": "0123456789",
-    "maintenance_day": 2
-}';
-        return $pool_configuration_json;
+        return $this->FetchData(self::ONDILO_URL . self::LIST_POOLS . '/' . $pool_id . self::CONFIGURATION);
     }
 
     /** Pool/spa shares
@@ -531,16 +453,7 @@ class OndiloCloud extends IPSModule
      */
     private function GetPoolSharesData(string $pool_id)
     {
-        // $pool_shares_json = $this->FetchData(self::ONDILO_URL . self::POOLS . $pool_id . self::SHARES);
-        $pool_shares_json = '[
-    {
-        "lastname": "Doe",
-        "firstname": "Jane",
-        "email": "jane@doe.org",
-        "shared_since": "2019-12-06T11:29:36+0000"
-    }
-]';
-        return $pool_shares_json;
+        return $this->FetchData(self::ONDILO_URL . self::LIST_POOLS . '/' . $pool_id . self::SHARES);
     }
 
     /** Last measure
@@ -548,38 +461,8 @@ class OndiloCloud extends IPSModule
      */
     private function GetLastMeasureData($pool_id)
     {
-        // $last_measure = $this->FetchData(self::ONDILO_URL . self::POOLS . $pool_id . self::LAST_MEASURES);
-        $last_measure = '[
-    {
-        "data_type": "temperature",
-        "value": 12.5,
-        "value_time": "2020-03-23T16:08:51+0000",
-        "is_valid": true,
-        "exclusion_reason": null
-    },
-     {
-        "data_type": "ph",
-        "value": 7.4,
-        "value_time": "2020-03-23T16:08:51+0000",
-        "is_valid": true,
-        "exclusion_reason": null
-    },
-     {
-        "data_type": "tds",
-        "value": 287,
-        "value_time": "2020-03-23T16:08:51+0000",
-        "is_valid": true,
-        "exclusion_reason": null
-    },
-    {
-        "data_type": "orp",
-        "value": 523,
-        "value_time": "2020-03-23T16:08:51+0000",
-        "is_valid": true,
-        "exclusion_reason": null
-    }
-]';
-        $last_measure = json_decode($last_measure);
+        $last_measure = $this->FetchData(self::ONDILO_URL . self::LIST_POOLS . '/' . $pool_id . self::LAST_MEASURES);
+        $this->SendDebug('Last Measure',  $last_measure, 0);
         return $last_measure;
     }
 
@@ -588,28 +471,30 @@ class OndiloCloud extends IPSModule
      */
     private function GetSetOfMeasuresData(string $pool_id)
     {
-        $user_units = $this->FetchData(self::ONDILO_URL . self::POOLS . $pool_id . self::SET_OF_MEASURES);
-        if($user_units != false)
+        $last_measure_set = $this->FetchData(self::ONDILO_URL . self::LIST_POOLS . '/' . $pool_id . self::SET_OF_MEASURES);
+        /*
+        if($last_measure_set != false)
         {
-            $conductivity = $user_units->conductivity;
+            $conductivity = $last_measure_set->conductivity;
             $this->SendDebug('Ondlio conductivity', $conductivity, 0);
-            $hardness = $user_units->hardness;
+            $hardness = $last_measure_set->hardness;
             $this->SendDebug('Ondlio hardness', $hardness, 0);
-            $orp = $user_units->orp;
+            $orp = $$last_measure_set->orp;
             $this->SendDebug('Ondlio orp', $orp, 0);
-            $pressure = $user_units->pressure;
+            $pressure = $last_measure_set->pressure;
             $this->SendDebug('Ondlio pressure', $pressure, 0);
-            $salt = $user_units->salt;
+            $salt = $last_measure_set->salt;
             $this->SendDebug('Ondlio conductivity', $salt, 0);
-            $speed = $user_units->speed;
+            $speed = $last_measure_set->speed;
             $this->SendDebug('Ondlio speed', $speed, 0);
-            $temperature = $user_units->temperature;
+            $temperature = $last_measure_set->temperature;
             $this->SendDebug('Ondlio temperature', $temperature, 0);
-            $volume = $user_units->volume;
+            $volume = $last_measure_set->volume;
             $this->SendDebug('Ondlio volume', $volume, 0);
-            $this->WriteAttributeString('user_units', $user_units);
+            $this->WriteAttributeString('user_units', $last_measure_set);
         }
-        return $user_units;
+        */
+        return $last_measure_set;
     }
 
     /** List active recommendations
@@ -617,7 +502,8 @@ class OndiloCloud extends IPSModule
      */
     private function GetListActiveRecommendationsData(string $pool_id)
     {
-        $user_units = $this->FetchData(self::ONDILO_URL . self::POOLS . $pool_id . self::RECOMMENDATIONS);
+        $recomendations = $this->FetchData(self::ONDILO_URL . self::LIST_POOLS . '/' . $pool_id . self::RECOMMENDATIONS);
+        /*
         if($user_units != false)
         {
             $conductivity = $user_units->conductivity;
@@ -638,7 +524,8 @@ class OndiloCloud extends IPSModule
             $this->SendDebug('Ondlio volume', $volume, 0);
             $this->WriteAttributeString('user_units', $user_units);
         }
-        return $user_units;
+        */
+        return $recomendations;
     }
 
     /** Validate recommendation
@@ -646,7 +533,8 @@ class OndiloCloud extends IPSModule
      */
     private function ValidateRecommendation(string $pool_id)
     {
-        $user_units = $this->FetchData(self::ONDILO_URL . self::POOLS . $pool_id . self::RECOMMENDATIONS);
+        $recomendations = $this->FetchData(self::ONDILO_URL . self::LIST_POOLS . '/' . $pool_id . self::RECOMMENDATIONS); // todo
+        /*
         if($user_units != false)
         {
             $conductivity = $user_units->conductivity;
@@ -667,7 +555,8 @@ class OndiloCloud extends IPSModule
             $this->SendDebug('Ondlio volume', $volume, 0);
             $this->WriteAttributeString('user_units', $user_units);
         }
-        return $user_units;
+        */
+        return $recomendations;
     }
 
     private function PutData($url, $content)
@@ -698,7 +587,7 @@ class OndiloCloud extends IPSModule
         $opts = array(
             "http" => array(
                 "method" => "POST",
-                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nAuthorization-Provider: husqvarna\r\nX-Api-Key: " . self::APIKEY . "\r\n" . 'Content-Type: application/vnd.api+json' . "\r\n"
+                "header" => "Authorization: Bearer " . $this->FetchAccessToken() . "\r\nX-Api-Key: " . self::APIKEY . "\r\n" . 'Content-Type: application/vnd.api+json' . "\r\n"
                     . 'Content-Length: ' . strlen($content) . "\r\n",
                 'content' => $content,
                 "ignore_errors" => true
@@ -774,14 +663,6 @@ class OndiloCloud extends IPSModule
         }
         return $response;
     }
-
-
-
-
-
-
-
-
 
     /***********************************************************
      * Configuration Form
