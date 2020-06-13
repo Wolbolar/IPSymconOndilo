@@ -700,7 +700,7 @@ class OndiloCloud extends IPSModule
                 'type' => 'Button',
                 'visible' => true,
                 'caption' => 'Read configuration',
-                'onClick' => 'ONDILO_UpdateStatus($id);'
+                'onClick' => 'ONDILO_Update($id);'
             ]
         ];
         return $form;
