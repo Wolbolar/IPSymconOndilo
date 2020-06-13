@@ -29,7 +29,13 @@
       "cold": "kalt",
       "hot": "heiß",
       "Owner:": "Besitzer:",
-      "Read Pool Information": "Poolinformation auslesen"
+      "Read Pool Information": "Poolinformation auslesen",
+      "battery": "Batterie",
+      "battery time": "Batterie Zeit",
+      "battery is valid": "Batterie ist gültig",
+      "rssi": "rssi",
+      "rssi time": "rssi Zeit",
+      "rssi is valid": "rssi ist gültig"
     },
     "de_AT": {
       "serial number: ": "Seriennummer: ",
@@ -60,7 +66,13 @@
       "cold": "kalt",
       "hot": "heiß",
       "Owner:": "Besitzer:",
-      "Read Pool Information": "Poolinformation auslesen"
+      "Read Pool Information": "Poolinformation auslesen",
+      "battery": "Batterie",
+      "battery time": "Batterie Zeit",
+      "battery is valid": "Batterie ist gültig",
+      "rssi": "rssi",
+      "rssi time": "rssi Zeit",
+      "rssi is valid": "rssi ist gültig"
     },
     "de_CH": {
       "serial number: ": "Seriennummer: ",
@@ -91,7 +103,13 @@
       "cold": "kalt",
       "hot": "heiß",
       "Owner:": "Besitzer:",
-      "Read Pool Information": "Poolinformation auslesen"
+      "Read Pool Information": "Poolinformation auslesen",
+      "battery": "Batterie",
+      "battery time": "Batterie Zeit",
+      "battery is valid": "Batterie ist gültig",
+      "rssi": "rssi",
+      "rssi time": "rssi Zeit",
+      "rssi is valid": "rssi ist gültig"
     },
     "fr": {
       "serial number: ": "numéro de série:",
@@ -122,7 +140,13 @@
       "cold": "kalt",
       "hot": "heiß",
       "Owner:": "Besitzer:",
-      "Read Pool Information": "Poolinformation auslesen"
+      "Read Pool Information": "Poolinformation auslesen",
+      "battery": "Batterie",
+      "battery time": "Batterie Zeit",
+      "battery is valid": "Batterie ist gültig",
+      "rssi": "rssi",
+      "rssi time": "rssi Zeit",
+      "rssi is valid": "rssi ist gültig"
     }
   }
 }

@@ -2,7 +2,7 @@
 [![Version](https://img.shields.io/badge/Symcon-PHPModul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Version](https://img.shields.io/badge/Symcon%20Version-5.0%20%3E-green.svg)](https://www.symcon.de/forum/threads/37412-IP-Symcon-5-0-%28Testing%29)
 
-Module for IP-Symcon from version 5. Allows communication with Ondilo devices.
+Module for IP-Symcon from version 5. Allows communication with Ondilo ICO devices.
 
 ## Documentation
 
@@ -17,12 +17,13 @@ Module for IP-Symcon from version 5. Allows communication with Ondilo devices.
 
 ## 1. Features
 
-Control Ondilo devices via Ondilo Cloud API. 
+Read data from Ondilo ICO devices via Ondilo ICO Cloud API. 
 	  
 ## 2. Requirements
 
  - IPS 5.2
- - Ondilo username and Ondilo ICO
+ - Ondilo ICO account
+ - Ondilo ICO
  - IP-Symcon Connect
 
 ## 3. Installation
@@ -38,7 +39,7 @@ Then click on the module store (IP-Symcon > 5.2) icon in the upper right corner.
 In the search field type
 
 ```
-Ondilo
+Ondilo ICO
 ```  
 
 
@@ -60,19 +61,15 @@ Then a Configure Interface window appears, here you press the _Register_ button 
 
 ![Interface](img/register.png?raw=true "interface")
 
-Ondilo's login page opens. Here you enter the Ondilo user name and the Ondilo password in the mask and continue by clicking on _Login_.
+Ondilo's login page opens. Here you enter the Ondilo user name and the Ondilo password in the mask and continue by clicking on _Authorize_.
 
+![Anmeldung](img/oauth_1.png?raw=true "Anmeldung")
 
+Now that you have confirmed with Ondilo that the IP-Symcon is allowed to read out the data of the Ondilo ICO user account you get to the confirmation page.
 
-Ondilo now asks if IP-Symcon as a system can read out personal devices, control Ondilo devices and read out the status of the devices.
-Here you have to confirm with _Yes_ to allow IP-Symcon to read data from the Ondilo ICO.
-
-
+![Success](img/oauth_2.png?raw=true "Success")
 
 A confirmation by IP-Symcon appears that the authentication was successful,
- 
-
-
 then the browser window can be closed and you return to IP-Symcon.
 Back at the Configure Interface window, go to _Next_
 
@@ -83,19 +80,19 @@ Now we open the configurator instance in the object tree under _configurator ins
 
 Now we switch to the instance _**Ondilo**_ (type Ondilo Configurator) in the object tree under _Configurator Instances_.
 
-
-
 All devices that are registered with Ondilo under the account and supported by the Ondilo API are listed here.
 
 A single device can be created by marking the device and pressing the _Create_ button. The configurator then creates a device instance.
 
 ### e. Device instance setup
-A manual setup of a device module is not necessary, this is done via the configurator. If necessary, only the query interval has to be adjusted in the device module; the other fields, in particular the serial number (this is the identification of the device) and the device type ID (which controls which variables are created) are specified by the configurator.
+Manual configuration of a device module is not necessary, this is done using the configurator. Individual variables can still be activated in the device module for display on the web front if required.
 
 
 ## 4. Function reference
 
+### a. Webfront View
 
+![Webfront](img/webfront_ico.png?raw=true "Webfront")  
 
 ## 5. Configuration:
 

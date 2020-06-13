@@ -10,6 +10,10 @@ Modul für IP-Symcon ab Version 5. Ermöglicht das Auslesen eines Ondilo ICO dur
 IP-Symcon PHP module for reading data from Ondilo ICO from IP-Symcon
 
  - [English Documentation](docs/en/README.md "English documentation") 
+ 
+Module pour IP-Symcon à partir de la version 5. Permet à un ICO Ondilo d'être lu par IP-Symcon
+ 
+  - [Documentation en français](docs/fr/README.md "Documentation en français") 
 
 
 

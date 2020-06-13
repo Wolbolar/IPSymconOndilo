@@ -85,7 +85,18 @@ class OndiloDevice extends IPSModule
         $this->RegisterAttributeBoolean('ph_time_enabled', false);
         $this->RegisterAttributeBoolean('ph_is_valid', true);
         $this->RegisterAttributeBoolean('ph_is_valid_enabled', false);
-
+        $this->RegisterAttributeInteger('battery', 0);
+        $this->RegisterAttributeBoolean('battery_enabled', false);
+        $this->RegisterAttributeInteger('battery_time', 0);
+        $this->RegisterAttributeBoolean('battery_time_enabled', false);
+        $this->RegisterAttributeBoolean('battery_is_valid', true);
+        $this->RegisterAttributeBoolean('battery_is_valid_enabled', false);
+        $this->RegisterAttributeInteger('rssi', 0);
+        $this->RegisterAttributeBoolean('rssi_enabled', false);
+        $this->RegisterAttributeInteger('rssi_time', 0);
+        $this->RegisterAttributeBoolean('rssi_time_enabled', false);
+        $this->RegisterAttributeBoolean('rssi_is_valid', true);
+        $this->RegisterAttributeBoolean('rssi_is_valid_enabled', false);
 
         //we will wait until the kernel is ready
         $this->RegisterMessage(0, IPS_KERNELMESSAGE);
@@ -119,6 +130,8 @@ class OndiloDevice extends IPSModule
         if (IPS_GetKernelRunlevel() !== KR_READY) {
             return;
         }
+        $id = $this->ReadPropertyString('id');
+        $this->SetReceiveDataFilter(".*" . $id . ".*");
         $this->ValidateConfiguration();
     }
 
@@ -151,13 +164,13 @@ class OndiloDevice extends IPSModule
             'serial_number', $this->Translate('serial number'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
         );
         $temperature_ass = [
-            [15.0, $this->Translate("cold"). ' %.1f', "", 255],
-            [28.0, $this->Translate("ok"). ' %.1f', "", 65280],
-            [50.0, $this->Translate("hot"). ' %.1f', "", 16711680]];
+            [0.0, $this->Translate("cold"). ' %.1f', "", 255],
+            [15.0, $this->Translate("ok"). ' %.1f', "", 65280],
+            [28.0, $this->Translate("hot"). ' %.1f', "", 16711680]];
         $this->RegisterProfileAssociation('Ondilo.Temperature', 'Temperature', '', ' °C', 0, 50, 1, 1, VARIABLETYPE_FLOAT, $temperature_ass);
-        // todo temperature profile
+        // ~Temperature
         $this->SetupVariable(
-            'temperature', $this->Translate('temperature'), '~Temperature', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
+            'temperature', $this->Translate('temperature'), 'Ondilo.Temperature', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
         );
         $objid = $this->SetupVariable(
             'temperature_time', $this->Translate('temperature time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
@@ -166,15 +179,13 @@ class OndiloDevice extends IPSModule
         $this->SetupVariable(
             'temperature_is_valid', $this->Translate('temperature is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
-        // todo orp profile
-        /*
         $orp_ass = [
-            [650, $this->Translate("low"). ' %d', "", 255],
-            [750, $this->Translate("ok"). ' %d', "", 65280],
-            [5000, $this->Translate("high"). ' %d', "", 16711680]];
+            [0, $this->Translate("low"). ' %d', "", 255],
+            [650, $this->Translate("ok"). ' %d', "", 65280],
+            [750, $this->Translate("high"). ' %d', "", 16711680]];
         $this->RegisterProfileAssociation('Ondilo.ORP', 'DoctorBag', '', ' mV', 0, 5000, 10, 0, VARIABLETYPE_INTEGER, $orp_ass);
-        */
-        $this->RegisterProfile('Ondilo.ORP', 'DoctorBag', '', ' mV', 0, 5000, 10, 0, VARIABLETYPE_INTEGER);
+
+        // $this->RegisterProfile('Ondilo.ORP', 'DoctorBag', '', ' mV', 0, 5000, 10, 0, VARIABLETYPE_INTEGER);
         $this->SetupVariable(
             'orp', $this->Translate('redox potential'), 'Ondilo.ORP', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
         );
@@ -186,9 +197,9 @@ class OndiloDevice extends IPSModule
             'orp_is_valid', $this->Translate('orp is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
         $tds_ass = [
-            [200, $this->Translate("low"). ' %d', "", 255],
-            [250, $this->Translate("ok"). ' %d', "", 65280],
-            [5000, $this->Translate("high") . ' %d', "", 16711680]];
+            [0, $this->Translate("low"). ' %d', "", 255],
+            [200, $this->Translate("ok"). ' %d', "", 65280],
+            [250, $this->Translate("high") . ' %d', "", 16711680]];
         $this->RegisterProfileAssociation('Ondilo.TDS', 'Snow', '', ' ppm', 0, 5000, 10, 0, VARIABLETYPE_INTEGER, $tds_ass);
         $this->SetupVariable(
             'tds', $this->Translate('tds'), 'Ondilo.TDS', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
@@ -201,9 +212,9 @@ class OndiloDevice extends IPSModule
             'tds_is_valid', $this->Translate('tds is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
         $ph_ass = [
-            [6.8, $this->Translate("acidic"). ' %.1f', "", 16711680],
-            [7.4, $this->Translate("ok"). ' %.1f', "", 65280],
-            [14, $this->Translate("alkaline"). ' %.1f', "", 255]];
+            [0, $this->Translate("acidic"). ' %.1f', "", 16711680],
+            [6.8, $this->Translate("ok"). ' %.1f', "", 65280],
+            [7.4, $this->Translate("alkaline"). ' %.1f', "", 255]];
         $this->RegisterProfileAssociation('Ondilo.pH', 'Gauge', '', '', 0, 14, 1, 1, VARIABLETYPE_FLOAT, $ph_ass);
         $this->SetupVariable(
             'ph', $this->Translate('pH'), 'Ondilo.pH', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
@@ -220,6 +231,26 @@ class OndiloDevice extends IPSModule
         );
         $this->SetupVariable(
             'sw_version', $this->Translate('software version'), '', $this->_getPosition(), VARIABLETYPE_STRING, false, false
+        );
+        $this->SetupVariable(
+            'battery', $this->Translate('battery'), '~Battery.100', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+        );
+        $objid = $this->SetupVariable(
+            'battery_time', $this->Translate('battery time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+        );
+        IPS_SetIcon($objid, 'Clock');
+        $this->SetupVariable(
+            'battery_is_valid', $this->Translate('battery is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
+        );
+        $this->SetupVariable(
+            'rssi', $this->Translate('rssi'), '~Intensity.100', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+        );
+        $objid = $this->SetupVariable(
+            'rssi_time', $this->Translate('rssi time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+        );
+        IPS_SetIcon($objid, 'Clock');
+        $this->SetupVariable(
+            'rssi_is_valid', $this->Translate('rssi is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
 
         // $this->GetDeviceStatus();
@@ -302,16 +333,22 @@ class OndiloDevice extends IPSModule
         $this->SendDebug('Ondilo Write Values', 'Pool ID ' . $id, 0);
         $this->WriteEnabledValue('temperature', VARIABLETYPE_FLOAT, true);
         $this->WriteEnabledValue('temperature_time', VARIABLETYPE_INTEGER);
-        $this->WriteEnabledValue('temperature_is_valid', VARIABLETYPE_BOOLEAN, true);
+        $this->WriteEnabledValue('temperature_is_valid', VARIABLETYPE_BOOLEAN);
         $this->WriteEnabledValue('orp', VARIABLETYPE_INTEGER, true);
-        $this->WriteEnabledValue('orp_time', VARIABLETYPE_INTEGER, true);
-        $this->WriteEnabledValue('orp_is_valid', VARIABLETYPE_BOOLEAN, true);
+        $this->WriteEnabledValue('orp_time', VARIABLETYPE_INTEGER);
+        $this->WriteEnabledValue('orp_is_valid', VARIABLETYPE_BOOLEAN);
         $this->WriteEnabledValue('tds', VARIABLETYPE_INTEGER, true);
-        $this->WriteEnabledValue('tds_time', VARIABLETYPE_INTEGER, true);
-        $this->WriteEnabledValue('tds_is_valid', VARIABLETYPE_BOOLEAN, true);
+        $this->WriteEnabledValue('tds_time', VARIABLETYPE_INTEGER);
+        $this->WriteEnabledValue('tds_is_valid', VARIABLETYPE_BOOLEAN);
         $this->WriteEnabledValue('ph', VARIABLETYPE_FLOAT, true);
-        $this->WriteEnabledValue('ph_time', VARIABLETYPE_INTEGER, true);
-        $this->WriteEnabledValue('ph_is_valid', VARIABLETYPE_BOOLEAN, true);
+        $this->WriteEnabledValue('ph_time', VARIABLETYPE_INTEGER);
+        $this->WriteEnabledValue('ph_is_valid', VARIABLETYPE_BOOLEAN);
+        $this->WriteEnabledValue('battery', VARIABLETYPE_INTEGER);
+        $this->WriteEnabledValue('battery_time', VARIABLETYPE_INTEGER);
+        $this->WriteEnabledValue('battery_is_valid', VARIABLETYPE_BOOLEAN);
+        $this->WriteEnabledValue('rssi', VARIABLETYPE_INTEGER);
+        $this->WriteEnabledValue('rssi_time', VARIABLETYPE_INTEGER);
+        $this->WriteEnabledValue('rssi_is_valid', VARIABLETYPE_BOOLEAN);
     }
 
     // Ondilo API
@@ -362,8 +399,8 @@ class OndiloDevice extends IPSModule
     public function RequestAction($Ident, $Value)
     {
         /*
-        if ($Ident === 'VALVE_1_STATE') {
-            $this->ToggleValve($Value, 1);
+        if ($Ident === 'xx') {
+            $this->Do($Value, 1);
         }
         */
     }
@@ -396,7 +433,7 @@ class OndiloDevice extends IPSModule
         return $user_info;
     }
 
-    public function RequestStatus(string $endpoint)
+    private function RequestStatus(string $endpoint)
     {
         $id = $this->ReadPropertyString('id');
         $data = $this->SendDataToParent(json_encode([
@@ -579,6 +616,16 @@ class OndiloDevice extends IPSModule
                 $this->WriteAttributeInteger('ph_time', $this->CalculateTime($value_time, 'pH'));
                 $this->WriteAttributeBoolean('ph_is_valid', $is_valid);
             }
+            if ($data_type == 'battery') {
+                $this->WriteAttributeInteger('battery', $value);
+                $this->WriteAttributeInteger('battery_time', $this->CalculateTime($value_time, 'pH'));
+                $this->WriteAttributeBoolean('battery_is_valid', $is_valid);
+            }
+            if ($data_type == 'rssi') {
+                $this->WriteAttributeInteger('rssi', $value);
+                $this->WriteAttributeInteger('rssi_time', $this->CalculateTime($value_time, 'pH'));
+                $this->WriteAttributeBoolean('rssi_is_valid', $is_valid);
+            }
             $this->SendDebug('Ondilo data', $data_type . ': ' . $value, 0);
         }
         $this->WriteValues();
@@ -596,57 +643,83 @@ class OndiloDevice extends IPSModule
     /** Set of measures
      * @return string
      */
-    public function GetSetOfMeasuresData()
+    public function GetSetOfMeasures()
     {
-        $user_units = $this->RequestStatus('GetSetOfMeasures');
-        if ($user_units != false) {
+        $last_measures_json = $this->RequestStatus('GetSetOfMeasures');
+        $this->SendDebug('Receive ICO data', $last_measures_json, 0);
+        $last_measures = json_decode($last_measures_json);
+        // $this->FetchLastMeasure($last_measures);
+        return $last_measures;
+    }
+
+    /** List active recommendations
+     * @return string
+     */
+    public function GetListActiveRecommendations()
+    {
+        $recomendations = $this->RequestStatus('GetListActiveRecommendations');
+        /*
+        if($user_units != false)
+        {
             $conductivity = $user_units->conductivity;
-            $this->SendDebug('Ondilo conductivity', $conductivity, 0);
+            $this->SendDebug('Ondlio conductivity', $conductivity, 0);
             $hardness = $user_units->hardness;
-            $this->SendDebug('Ondilo hardness', $hardness, 0);
+            $this->SendDebug('Ondlio hardness', $hardness, 0);
             $orp = $user_units->orp;
-            $this->SendDebug('Ondilo orp', $orp, 0);
+            $this->SendDebug('Ondlio orp', $orp, 0);
             $pressure = $user_units->pressure;
-            $this->SendDebug('Ondilo pressure', $pressure, 0);
+            $this->SendDebug('Ondlio pressure', $pressure, 0);
             $salt = $user_units->salt;
-            $this->SendDebug('Ondilo conductivity', $salt, 0);
+            $this->SendDebug('Ondlio conductivity', $salt, 0);
             $speed = $user_units->speed;
-            $this->SendDebug('Ondilo speed', $speed, 0);
+            $this->SendDebug('Ondlio speed', $speed, 0);
             $temperature = $user_units->temperature;
-            $this->SendDebug('Ondilo temperature', $temperature, 0);
+            $this->SendDebug('Ondlio temperature', $temperature, 0);
             $volume = $user_units->volume;
-            $this->SendDebug('Ondilo volume', $volume, 0);
+            $this->SendDebug('Ondlio volume', $volume, 0);
             $this->WriteAttributeString('user_units', $user_units);
         }
-        return $user_units;
+        */
+        return $recomendations;
+    }
+
+    /** Validate recommendation
+     * @return string
+     */
+    public function ValidateRecommendation(string $recommendation_id)
+    {
+        $id = $this->ReadPropertyString('id');
+        $result = $this->SendDataToParent(json_encode([
+            'DataID' => '{13683E92-8B41-A54D-BFE4-6496AAFC7FF5}',
+            'Type' => 'PUT',
+            'Endpoint' => '/api/customer/v1/pools/' . $id . '/recommendations/' . $recommendation_id,
+            'id' => $id,
+            'Payload' => ''
+        ]));
+        return $result;
     }
 
     public function ReceiveData($JSONString)
     {
         $data = json_decode($JSONString);
         $payload = $data->Buffer;
-        $this->SendDebug('Receive ICO data', json_encode($payload), 0);
+        $this->SendDebug('Receive from I/O', json_encode($payload), 0);
         $this->CheckDeviceData($payload);
     }
 
-    private function CheckDeviceData($data)
+    private function CheckDeviceData($payload)
     {
-        if (!empty($data)) {
-            $this->FetchLastMeasure($data);
+        if (!empty($payload)) {
+            $pool_id = $payload->pool_id;
+            $id = $this->ReadPropertyString('id');
+            if($id == $pool_id)
+            {
+                $this->SendDebug('Receive ICO pool id', $pool_id, 0);
+                $data = $payload->data;
+                $this->SendDebug('Receive ICO data', json_encode($data), 0);
+                $this->FetchLastMeasure($data);
+            }
         }
-    }
-
-    public function SendCommand(string $service_id, string $data)
-    {
-        $id = $this->ReadPropertyString('id');
-        $result = $this->SendDataToParent(json_encode([
-            'DataID' => '{13683E92-8B41-A54D-BFE4-6496AAFC7FF5}',
-            'Type' => 'PUT',
-            'Endpoint' => '/command/' . $service_id,
-            'id' => $id,
-            'Payload' => $data
-        ]));
-        return $result;
     }
 
     public function SetWebFrontVariable(string $ident, bool $value)
@@ -840,6 +913,48 @@ class OndiloDevice extends IPSModule
                 'visible' => true,
                 'value' => $this->ReadAttributeBoolean('ph_is_valid_enabled'),
                 'onChange' => 'Ondilo_SetWebFrontVariable($id, "ph_is_valid_enabled", $ph_is_valid_enabled);'],
+            [
+                'name' => 'battery_enabled',
+                'type' => 'CheckBox',
+                'caption' => 'battery',
+                'visible' => true,
+                'value' => $this->ReadAttributeBoolean('battery_enabled'),
+                'onChange' => 'Ondilo_SetWebFrontVariable($id, "battery_enabled", $battery_enabled);'],
+            [
+                'name' => 'battery_is_valid_enabled',
+                'type' => 'CheckBox',
+                'caption' => 'battery is valid',
+                'visible' => true,
+                'value' => $this->ReadAttributeBoolean('battery_is_valid_enabled'),
+                'onChange' => 'Ondilo_SetWebFrontVariable($id, "battery_is_valid_enabled", $battery_is_valid_enabled);'],
+            [
+                'name' => 'battery_time_enabled',
+                'type' => 'CheckBox',
+                'caption' => 'battery time',
+                'visible' => true,
+                'value' => $this->ReadAttributeBoolean('battery_time_enabled'),
+                'onChange' => 'Ondilo_SetWebFrontVariable($id, "battery_time_enabled", $battery_time_enabled);'],
+            [
+                'name' => 'rssi_enabled',
+                'type' => 'CheckBox',
+                'caption' => 'rssi',
+                'visible' => true,
+                'value' => $this->ReadAttributeBoolean('rssi_enabled'),
+                'onChange' => 'Ondilo_SetWebFrontVariable($id, "rssi_enabled", $rssi_enabled);'],
+            [
+                'name' => 'rssi_time_enabled',
+                'type' => 'CheckBox',
+                'caption' => 'rssi time',
+                'visible' => true,
+                'value' => $this->ReadAttributeBoolean('rssi_time_enabled'),
+                'onChange' => 'Ondilo_SetWebFrontVariable($id, "rssi_time_enabled", $rssi_time_enabled);'],
+            [
+                'name' => 'rssi_is_valid_enabled',
+                'type' => 'CheckBox',
+                'caption' => 'rssi is valid',
+                'visible' => true,
+                'value' => $this->ReadAttributeBoolean('rssi_is_valid_enabled'),
+                'onChange' => 'Ondilo_SetWebFrontVariable($id, "rssi_is_valid_enabled", $rssi_is_valid_enabled);'],
             [
                 'type' => 'Button',
                 'visible' => true,
