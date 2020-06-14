@@ -165,7 +165,7 @@ class OndiloDevice extends IPSModule
         );
         $temperature_ass = [
             [0.0, $this->Translate("cold"). ' %.1f', "", 255],
-            [15.0, $this->Translate("ok"). ' %.1f', "", 65280],
+            [15.0, '%.1f', "", 65280],
             [28.0, $this->Translate("hot"). ' %.1f', "", 16711680]];
         $this->RegisterProfileAssociation('Ondilo.Temperature', 'Temperature', '', ' °C', 0, 50, 1, 1, VARIABLETYPE_FLOAT, $temperature_ass);
         // ~Temperature
@@ -181,7 +181,7 @@ class OndiloDevice extends IPSModule
         );
         $orp_ass = [
             [0, $this->Translate("low"). ' %d', "", 255],
-            [650, $this->Translate("ok"). ' %d', "", 65280],
+            [650, '%d', "", 65280],
             [750, $this->Translate("high"). ' %d', "", 16711680]];
         $this->RegisterProfileAssociation('Ondilo.ORP', 'DoctorBag', '', ' mV', 0, 5000, 10, 0, VARIABLETYPE_INTEGER, $orp_ass);
 
@@ -198,7 +198,7 @@ class OndiloDevice extends IPSModule
         );
         $tds_ass = [
             [0, $this->Translate("low"). ' %d', "", 255],
-            [200, $this->Translate("ok"). ' %d', "", 65280],
+            [200, '%d', "", 65280],
             [250, $this->Translate("high") . ' %d', "", 16711680]];
         $this->RegisterProfileAssociation('Ondilo.TDS', 'Snow', '', ' ppm', 0, 5000, 10, 0, VARIABLETYPE_INTEGER, $tds_ass);
         $this->SetupVariable(
@@ -212,9 +212,9 @@ class OndiloDevice extends IPSModule
             'tds_is_valid', $this->Translate('tds is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
         $ph_ass = [
-            [0, $this->Translate("acidic"). ' %.1f', "", 16711680],
-            [6.8, $this->Translate("ok"). ' %.1f', "", 65280],
-            [7.4, $this->Translate("alkaline"). ' %.1f', "", 255]];
+            [0, $this->Translate("acidic"). ' %.2f', "", 16711680],
+            [6.8, '%.2f', "", 65280],
+            [7.4, $this->Translate("alkaline"). ' %.2f', "", 255]];
         $this->RegisterProfileAssociation('Ondilo.pH', 'Gauge', '', '', 0, 14, 1, 1, VARIABLETYPE_FLOAT, $ph_ass);
         $this->SetupVariable(
             'ph', $this->Translate('pH'), 'Ondilo.pH', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
