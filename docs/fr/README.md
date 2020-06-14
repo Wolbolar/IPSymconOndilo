@@ -2,7 +2,7 @@
 [![Version](https://img.shields.io/badge/Symcon-PHPModul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Version](https://img.shields.io/badge/Symcon%20Version-5.0%20%3E-green.svg)](https://www.symcon.de/forum/threads/37412-IP-Symcon-5-0-%28Testing%29)
 
-Module pour IP-Symcon à partir de la version 5. Permet la communication avec un périphérique Ondilo ICO.
+Module pour IP-Symcon à partir de la version 5. Permet la communication avec un périphérique [Ondilo ICO](https://ondilo.com).
 
 ## Documentation
 
@@ -23,7 +23,7 @@ Lecture des données de mesure d'un appareil Ondilo ICO via l'API Ondilo ICO.
 
  - IPS 5.2
  - Compte utilisateur Ondilo ICO
- - Ondilo ICO
+ - [Ondilo ICO](https://ondilo.com)
  - IP-Symcon Connect
 
 ## 3. Installation

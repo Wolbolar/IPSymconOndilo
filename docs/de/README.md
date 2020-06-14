@@ -16,13 +16,16 @@ Modul für IP-Symcon ab Version 5. Ermöglicht die Kommunikation mit einem Ondil
 
 ## 1. Funktionsumfang
 
-Auslesen der Messdaten eines Ondilo ICO Gerätes über die Ondilo ICO API.
+Auslesen der Messdaten eines [Ondilo ICO](https://ondilo.com/en) Gerätes über die Ondilo ICO API.
+
+
+
 
 ## 2. Voraussetzungen
 
  - IPS 5.2
  - Ondilo ICO Benutzerkonto
- - Ondilo ICO
+ - [Ondilo ICO](https://ondilo.com/en)
  - IP-Symcon Connect
 
 ## 3. Installation
