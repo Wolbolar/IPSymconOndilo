@@ -69,7 +69,7 @@ Anschließend erscheint ein Fenster Schnittstelle konfigurieren, hier drückt ma
 
 Es öffnet sich die Anmeldeseite von Ondilo. Hier gibt man in die Maske den Ondilo Benutzernamen und das Ondilo Passwort an und fährt mit einem Klick auf _Authorize_ fort.
 
-![Anmeldung](img/oauth_1.png?raw=true "Anmeldung")
+![Anmeldung](img/oauth_1_de.png?raw=true "Anmeldung")
 
 Nachdem man jetzt bei Ondilo bestätigt hat das IP-Symcon die Daten des Ondilo ICO Benutzerkontos auslesen darf gelangt man zur Bestätigungsseite.
 
