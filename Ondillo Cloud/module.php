@@ -427,6 +427,7 @@ class OndiloCloud extends IPSModule
     }
 
     /** Pool/spa device
+     * @param string $pool_id
      * @return string
      */
     private function GetPoolDeviceData(string $pool_id)

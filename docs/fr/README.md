@@ -63,7 +63,7 @@ Ensuite, une fenêtre Configurer l'interface apparaît, ici vous appuyez sur le 
 
 Ondilo's login page opens. Here you enter the Ondilo user name and the Ondilo password in the mask and continue by clicking on _Authorize_.
 
-![Anmeldung](img/oauth_1.png?raw=true "Anmeldung")
+![Anmeldung](img/oauth_1_fr.png?raw=true "Anmeldung")
 
 Maintenant que vous avez confirmé avec Ondilo que IP-Symcon est autorisé à lire les données du compte utilisateur Ondilo ICO, vous accédez à la page de confirmation.
 
