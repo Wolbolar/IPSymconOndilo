@@ -412,16 +412,23 @@ class OndiloCloud extends IPSModule
      */
     public function GetListPools()
     {
-        $list_of_pools_json = $this->FetchData(self::ONDILO_URL . self::LIST_POOLS);
-        $list_of_pools = json_decode($list_of_pools_json);
-        if($list_of_pools != false)
+        $token = $this->CheckToken();
+        if($token == '')
         {
-            foreach($list_of_pools as $key => $pool)
+            $list_of_pools_json = '[]';
+        }
+        else{
+            $list_of_pools_json = $this->FetchData(self::ONDILO_URL . self::LIST_POOLS);
+            $list_of_pools = json_decode($list_of_pools_json);
+            if($list_of_pools != false)
             {
-                $id = $pool->id;
-                $this->SendDebug('Ondlio Pool ID', $id, 0);
+                foreach($list_of_pools as $key => $pool)
+                {
+                    $id = $pool->id;
+                    $this->SendDebug('Ondlio Pool ID', $id, 0);
+                }
+                $this->WriteAttributeString('list_pools', json_encode($list_of_pools));
             }
-            $this->WriteAttributeString('list_pools', json_encode($list_of_pools));
         }
         return $list_of_pools_json;
     }
@@ -436,6 +443,7 @@ class OndiloCloud extends IPSModule
     }
 
     /** Pool/spa configuration
+     * @param string $pool_id
      * @return string
      */
     private function GetPoolConfigurationData(string $pool_id)
@@ -444,6 +452,7 @@ class OndiloCloud extends IPSModule
     }
 
     /** Pool/spa shares
+     * @param string $pool_id
      * @return string
      */
     private function GetPoolSharesData(string $pool_id)
@@ -452,6 +461,7 @@ class OndiloCloud extends IPSModule
     }
 
     /** Last measure
+     * @param string $pool_id
      * @return string
      */
     private function GetLastMeasureData($pool_id)
@@ -462,6 +472,7 @@ class OndiloCloud extends IPSModule
     }
 
     /** Set of measures
+     * @param string $pool_id
      * @return string
      */
     private function GetSetOfMeasuresData(string $pool_id)
@@ -470,6 +481,7 @@ class OndiloCloud extends IPSModule
     }
 
     /** List active recommendations
+     * @param string $pool_id
      * @return string
      */
     private function GetListActiveRecommendationsData(string $pool_id)

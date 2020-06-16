@@ -24,41 +24,20 @@ class OndiloConfigurator extends IPSModule
         {
             $this->SetStatus(202);
         }
-        /*
-        $token = $this->GetGardenaToken();
+
+        $token = $this->GetOndiloToken();
         if ($token == '') {
-            $this->SendDebug('Gardena Token', $token, 0);
-            $this->SendDebug('Gardena Token', 'Instance set inactive', 0);
+            $this->SendDebug('Ondilo Token', 'Instance set inactive', 0);
             $this->SetStatus(IS_INACTIVE);
         } else {
             $this->SetStatus(IS_ACTIVE);
         }
-        */
-        $this->SetStatus(IS_ACTIVE);
     }
 
     public function GetOndiloToken()
     {
         $token = $this->RequestDataFromParent('token');
         return $token;
-    }
-
-    /** Get Snapshot
-     * @return bool|false|string
-     */
-    public function RequestSnapshot()
-    {
-        /*
-        $location_id = $this->RequestDataFromParent('location_id');
-        if ($location_id != '') {
-            $snapshot = $this->RequestDataFromParent('snapshotbuffer');
-        } else {
-            $snapshot = '[]';
-        }
-        $this->SendDebug('Gardena Request Response', $snapshot, 0);
-        $this->WriteAttributeString('location_snapshot', $snapshot);
-        return $snapshot;
-        */
     }
 
     public function GetConfiguration()
@@ -91,86 +70,6 @@ class OndiloConfigurator extends IPSModule
         return $data;
     }
 
-    /** Get Device Type
-     * @param $device
-     * @return array
-     */
-    private function GetDeviceType($device)
-    {
-        $data = [];
-        $model_type = $device['attributes']['modelType']['value'];
-        if ($model_type == 'Ondilo smart Irrigation Control') {
-            $data = $this->GetIrrigationControlData($device);
-        } elseif ($model_type == 'Ondilo smart Sensor') {
-            $data = $this->GetSensorInfo($device);
-        }
-        elseif ($model_type == 'Ondilo smart Water Control') {
-            $data = $this->GetWaterControlData($device);
-        }
-        return $data;
-    }
-
-    /** Get Sensor Info
-     * @param $device
-     * @return array
-     */
-    private function GetSensorInfo($device)
-    {
-        $id = $device['id'];
-        $model_type = $device['attributes']['modelType']['value'];
-        $name = $device['attributes']['name']['value'];
-        $battery_level = $device['attributes']['batteryLevel']['value'];
-        $this->SendDebug('Ondilo Device ' . $name, 'battery level: ' . $battery_level . '%', 0);
-        $battery_level_timestamp = $device['attributes']['batteryLevel']['timestamp'];
-        $this->SendDebug('Ondilo Device ' . $name, 'battery level timestamp: ' . $battery_level_timestamp, 0);
-        $battery_state = $device['attributes']['batteryState']['value'];
-        $this->SendDebug('Ondilo Device ' . $name, 'battery state: ' . $battery_state, 0);
-        $battery_state_timestamp = $device['attributes']['batteryState']['timestamp'];
-        $this->SendDebug('Ondilo Device ' . $name, 'battery state timestamp: ' . $battery_state_timestamp, 0);
-        $rf_link_level = $device['attributes']['rfLinkLevel']['value'];
-        $this->SendDebug('Ondilo Device ' . $name, 'RF link level: ' . $rf_link_level . '%', 0);
-        $rf_link_level_timestamp = $device['attributes']['rfLinkLevel']['timestamp'];
-        $this->SendDebug('Ondilo Device ' . $name, 'RF link level timestamp: ' . $rf_link_level_timestamp, 0);
-        $serial = $device['attributes']['serial']['value'];
-        $this->SendDebug('Ondilo Device ' . $name, 'serial: ' . $serial, 0);
-        $rf_link_state = $device['attributes']['rfLinkState']['value'];
-        $this->SendDebug('Ondilo Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
-
-        return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state, 'model_type' => $model_type];
-    }
-
-    /** Get Irrigation Control Data
-     * @param $device
-     * @return array
-     */
-    private function GetIrrigationControlData($device)
-    {
-        $id = $device['id'];
-        $model_type = $device['attributes']['modelType']['value'];
-        $name = $device['attributes']['name']['value'];
-        $serial = $device['attributes']['serial']['value'];
-        $this->SendDebug('Ondilo Device ' . $name, 'serial: ' . $serial, 0);
-        $rf_link_state = $device['attributes']['rfLinkState']['value'];
-        $this->SendDebug('Ondilo Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
-        return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state, 'model_type' => $model_type];
-    }
-
-    /** Get Water Control Data
-     * @param $device
-     * @return array
-     */
-    private function GetWaterControlData($device)
-    {
-        $id = $device['id'];
-        $model_type = $device['attributes']['modelType']['value'];
-        $name = $device['attributes']['name']['value'];
-        $serial = $device['attributes']['serial']['value'];
-        $this->SendDebug('Ondilo Device ' . $name, 'serial: ' . $serial, 0);
-        $rf_link_state = $device['attributes']['rfLinkState']['value'];
-        $this->SendDebug('Ondilo Device ' . $name, 'RF link state: ' . $rf_link_state, 0);
-        return ['id' => $id, 'name' => $name, 'serial' => $serial, 'rf_link_state' => $rf_link_state, 'model_type' => $model_type];
-    }
-
     /**
      * Liefert alle Geräte.
      *
@@ -180,7 +79,7 @@ class OndiloConfigurator extends IPSModule
     {
         $config_list = [];
         $list_pools = $this->RequestDataFromParent('GetListPools');
-        if ($list_pools != '') {
+        if ($list_pools != '[]') {
             $OndiloInstanceIDList = IPS_GetInstanceListByModuleID('{78C7A7D8-6E03-E200-7E9C-11B47D1A50DE}'); // Ondilo Devices
             $payload = json_decode($list_pools);
             $counter = count($payload);
@@ -281,33 +180,8 @@ class OndiloConfigurator extends IPSModule
      */
     protected function FormHead()
     {
-
-        // $list_pools = $this->RequestDataFromParent('GetListPools');
-        $list_pools = '[
-    {
-        "id": 234,
-        "name": "John\'s Pool",
-        "type": "outdoor_inground_pool",
-        "volume": 15,
-        "disinfection": {
-            "primary": "chlorine",
-            "secondary": {
-                "uv_sanitizer": true,
-                "ozonator": false
-            }
-        },
-        "address": {
-            "street": "162 Avenue Robert Schuman",
-            "zipcode": "13760",
-            "city": "Saint-Cannat",
-            "country": "France",
-            "latitude": 43.612282,
-            "longitude": 5.3179397
-        },
-        "updated_at": "2019-11-27T23:00:21+0000"
-    }
-]';
-        if ($list_pools == '') {
+        $list_pools = $this->RequestDataFromParent('GetListPools');
+        if ($list_pools == '[]') {
             $show_config = false;
         } else {
             $show_config = true;

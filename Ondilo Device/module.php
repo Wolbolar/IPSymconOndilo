@@ -627,28 +627,6 @@ class OndiloDevice extends IPSModule
     public function GetListActiveRecommendations()
     {
         $recomendations = $this->RequestStatus('GetListActiveRecommendations');
-        /*
-        if($user_units != false)
-        {
-            $conductivity = $user_units->conductivity;
-            $this->SendDebug('Ondlio conductivity', $conductivity, 0);
-            $hardness = $user_units->hardness;
-            $this->SendDebug('Ondlio hardness', $hardness, 0);
-            $orp = $user_units->orp;
-            $this->SendDebug('Ondlio orp', $orp, 0);
-            $pressure = $user_units->pressure;
-            $this->SendDebug('Ondlio pressure', $pressure, 0);
-            $salt = $user_units->salt;
-            $this->SendDebug('Ondlio conductivity', $salt, 0);
-            $speed = $user_units->speed;
-            $this->SendDebug('Ondlio speed', $speed, 0);
-            $temperature = $user_units->temperature;
-            $this->SendDebug('Ondlio temperature', $temperature, 0);
-            $volume = $user_units->volume;
-            $this->SendDebug('Ondlio volume', $volume, 0);
-            $this->WriteAttributeString('user_units', $user_units);
-        }
-        */
         return $recomendations;
     }
 
