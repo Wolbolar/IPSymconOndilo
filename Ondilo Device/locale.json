@@ -33,9 +33,10 @@
       "battery": "Batterie",
       "battery time": "Batterie Zeit",
       "battery is valid": "Batterie ist gültig",
-      "rssi": "rssi",
+      "rssi": "Empfangssignal",
       "rssi time": "rssi Zeit",
-      "rssi is valid": "rssi ist gültig"
+      "rssi is valid": "rssi ist gültig",
+      "last measure": "letzte Abfrage"
     },
     "de_AT": {
       "serial number: ": "Seriennummer: ",
@@ -70,9 +71,10 @@
       "battery": "Batterie",
       "battery time": "Batterie Zeit",
       "battery is valid": "Batterie ist gültig",
-      "rssi": "rssi",
+      "rssi": "Empfangssignal",
       "rssi time": "rssi Zeit",
-      "rssi is valid": "rssi ist gültig"
+      "rssi is valid": "rssi ist gültig",
+      "last measure": "letzte Abfrage"
     },
     "de_CH": {
       "serial number: ": "Seriennummer: ",
@@ -107,9 +109,10 @@
       "battery": "Batterie",
       "battery time": "Batterie Zeit",
       "battery is valid": "Batterie ist gültig",
-      "rssi": "rssi",
+      "rssi": "Empfangssignal",
       "rssi time": "rssi Zeit",
-      "rssi is valid": "rssi ist gültig"
+      "rssi is valid": "rssi ist gültig",
+      "last measure": "letzte Abfrage"
     },
     "fr": {
       "serial number: ": "numéro de série:",
@@ -134,19 +137,20 @@
       "pH is valid": "pH est valide",
       "pool id: ": "identifiant de pool: ",
       "software version": "une version de logiciel",
-      "alkaline": "alkalisch",
-      "acidic": "sauer",
+      "alkaline": "alcalin",
+      "acidic": "acide",
       "ok": "ok",
-      "cold": "kalt",
-      "hot": "heiß",
-      "Owner:": "Besitzer:",
-      "Read Pool Information": "Poolinformation auslesen",
-      "battery": "Batterie",
+      "cold": "froid",
+      "hot": "chaud",
+      "Owner:": "Propriétaire:",
+      "Read Pool Information": "Lire les informations sur la piscine",
+      "battery": "batterie",
       "battery time": "Batterie Zeit",
       "battery is valid": "Batterie ist gültig",
-      "rssi": "rssi",
-      "rssi time": "rssi Zeit",
-      "rssi is valid": "rssi ist gültig"
+      "rssi": "Signal reçu",
+      "rssi time": "rssi temps",
+      "rssi is valid": "rssi est valide",
+      "last measure": "dernière mesure"
     }
   }
 }

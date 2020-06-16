@@ -61,40 +61,30 @@ class OndiloDevice extends IPSModule
         $this->RegisterAttributeInteger('pool_guy_number', 0);
         $this->RegisterAttributeInteger('maintenance_day', 0);
         $this->RegisterAttributeString('pool_shares', '[]');
+        $this->RegisterAttributeInteger('last_measure', 0);
+        $this->RegisterAttributeBoolean('last_measure_enabled', false);
         $this->RegisterAttributeFloat('temperature', 0);
         $this->RegisterAttributeBoolean('temperature_enabled', false);
-        $this->RegisterAttributeInteger('temperature_time', 0);
-        $this->RegisterAttributeBoolean('temperature_time_enabled', false);
         $this->RegisterAttributeBoolean('temperature_is_valid', true);
         $this->RegisterAttributeBoolean('temperature_is_valid_enabled', false);
         $this->RegisterAttributeInteger('orp', 0);
         $this->RegisterAttributeBoolean('orp_enabled', false);
-        $this->RegisterAttributeInteger('orp_time', 0);
-        $this->RegisterAttributeBoolean('orp_time_enabled', false);
         $this->RegisterAttributeBoolean('orp_is_valid', true);
         $this->RegisterAttributeBoolean('orp_is_valid_enabled', false);
         $this->RegisterAttributeInteger('tds', 0);
         $this->RegisterAttributeBoolean('tds_enabled', false);
-        $this->RegisterAttributeInteger('tds_time', 0);
-        $this->RegisterAttributeBoolean('tds_time_enabled', false);
         $this->RegisterAttributeBoolean('tds_is_valid', true);
         $this->RegisterAttributeBoolean('tds_is_valid_enabled', false);
         $this->RegisterAttributeFloat('ph', 0);
         $this->RegisterAttributeBoolean('ph_enabled', false);
-        $this->RegisterAttributeInteger('ph_time', 0);
-        $this->RegisterAttributeBoolean('ph_time_enabled', false);
         $this->RegisterAttributeBoolean('ph_is_valid', true);
         $this->RegisterAttributeBoolean('ph_is_valid_enabled', false);
         $this->RegisterAttributeInteger('battery', 0);
         $this->RegisterAttributeBoolean('battery_enabled', false);
-        $this->RegisterAttributeInteger('battery_time', 0);
-        $this->RegisterAttributeBoolean('battery_time_enabled', false);
         $this->RegisterAttributeBoolean('battery_is_valid', true);
         $this->RegisterAttributeBoolean('battery_is_valid_enabled', false);
         $this->RegisterAttributeInteger('rssi', 0);
         $this->RegisterAttributeBoolean('rssi_enabled', false);
-        $this->RegisterAttributeInteger('rssi_time', 0);
-        $this->RegisterAttributeBoolean('rssi_time_enabled', false);
         $this->RegisterAttributeBoolean('rssi_is_valid', true);
         $this->RegisterAttributeBoolean('rssi_is_valid_enabled', false);
 
@@ -172,10 +162,6 @@ class OndiloDevice extends IPSModule
         $this->SetupVariable(
             'temperature', $this->Translate('temperature'), 'Ondilo.Temperature', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
         );
-        $objid = $this->SetupVariable(
-            'temperature_time', $this->Translate('temperature time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
-        );
-        IPS_SetIcon($objid, 'Clock');
         $this->SetupVariable(
             'temperature_is_valid', $this->Translate('temperature is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
@@ -189,10 +175,6 @@ class OndiloDevice extends IPSModule
         $this->SetupVariable(
             'orp', $this->Translate('redox potential'), 'Ondilo.ORP', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
         );
-        $objid = $this->SetupVariable(
-            'orp_time', $this->Translate('orp time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
-        );
-        IPS_SetIcon($objid, 'Clock');
         $this->SetupVariable(
             'orp_is_valid', $this->Translate('orp is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
@@ -204,10 +186,6 @@ class OndiloDevice extends IPSModule
         $this->SetupVariable(
             'tds', $this->Translate('tds'), 'Ondilo.TDS', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
         );
-        $objid = $this->SetupVariable(
-            'tds_time', $this->Translate('tds time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
-        );
-        IPS_SetIcon($objid, 'Clock');
         $this->SetupVariable(
             'tds_is_valid', $this->Translate('tds is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
@@ -219,10 +197,6 @@ class OndiloDevice extends IPSModule
         $this->SetupVariable(
             'ph', $this->Translate('pH'), 'Ondilo.pH', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
         );
-        $objid = $this->SetupVariable(
-            'ph_time', $this->Translate('pH time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
-        );
-        IPS_SetIcon($objid, 'Clock');
         $this->SetupVariable(
             'ph_is_valid', $this->Translate('pH is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
@@ -235,20 +209,25 @@ class OndiloDevice extends IPSModule
         $this->SetupVariable(
             'battery', $this->Translate('battery'), '~Battery.100', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
         );
-        $objid = $this->SetupVariable(
-            'battery_time', $this->Translate('battery time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
-        );
-        IPS_SetIcon($objid, 'Clock');
         $this->SetupVariable(
             'battery_is_valid', $this->Translate('battery is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
+        $obj_lastmeasure = @$this->GetIDForIdent('last_measure');
+        if($obj_lastmeasure == false)
+        {
+            $last_measure_exist = false;
+        }
+        $objid = $this->SetupVariable(
+            'last_measure', $this->Translate('last measure'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
+        );
+        if($last_measure_exist == false)
+        {
+            IPS_SetIcon($objid, 'Clock');
+        }
+
         $this->SetupVariable(
             'rssi', $this->Translate('rssi'), '~Intensity.100', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
         );
-        $objid = $this->SetupVariable(
-            'rssi_time', $this->Translate('rssi time'), '~UnixTimestamp', $this->_getPosition(), VARIABLETYPE_INTEGER, false, false
-        );
-        IPS_SetIcon($objid, 'Clock');
         $this->SetupVariable(
             'rssi_is_valid', $this->Translate('rssi is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
@@ -332,22 +311,17 @@ class OndiloDevice extends IPSModule
         $id = $this->ReadPropertyString('id');
         $this->SendDebug('Ondilo Write Values', 'Pool ID ' . $id, 0);
         $this->WriteEnabledValue('temperature', VARIABLETYPE_FLOAT, true);
-        $this->WriteEnabledValue('temperature_time', VARIABLETYPE_INTEGER);
+        $this->WriteEnabledValue('last_measure', VARIABLETYPE_INTEGER);
         $this->WriteEnabledValue('temperature_is_valid', VARIABLETYPE_BOOLEAN);
         $this->WriteEnabledValue('orp', VARIABLETYPE_INTEGER, true);
-        $this->WriteEnabledValue('orp_time', VARIABLETYPE_INTEGER);
         $this->WriteEnabledValue('orp_is_valid', VARIABLETYPE_BOOLEAN);
         $this->WriteEnabledValue('tds', VARIABLETYPE_INTEGER, true);
-        $this->WriteEnabledValue('tds_time', VARIABLETYPE_INTEGER);
         $this->WriteEnabledValue('tds_is_valid', VARIABLETYPE_BOOLEAN);
         $this->WriteEnabledValue('ph', VARIABLETYPE_FLOAT, true);
-        $this->WriteEnabledValue('ph_time', VARIABLETYPE_INTEGER);
         $this->WriteEnabledValue('ph_is_valid', VARIABLETYPE_BOOLEAN);
         $this->WriteEnabledValue('battery', VARIABLETYPE_INTEGER);
-        $this->WriteEnabledValue('battery_time', VARIABLETYPE_INTEGER);
         $this->WriteEnabledValue('battery_is_valid', VARIABLETYPE_BOOLEAN);
         $this->WriteEnabledValue('rssi', VARIABLETYPE_INTEGER);
-        $this->WriteEnabledValue('rssi_time', VARIABLETYPE_INTEGER);
         $this->WriteEnabledValue('rssi_is_valid', VARIABLETYPE_BOOLEAN);
     }
 
@@ -598,32 +572,27 @@ class OndiloDevice extends IPSModule
             // $exclusion_reason = $last_measure->exclusion_reason;
             if ($data_type == 'temperature') {
                 $this->WriteAttributeFloat('temperature', $value);
-                $this->WriteAttributeInteger('temperature_time', $this->CalculateTime($value_time, 'temperature'));
+                $this->WriteAttributeInteger('last_measure', $this->CalculateTime($value_time, 'last measure'));
                 $this->WriteAttributeBoolean('temperature_is_valid', $is_valid);
             }
             if ($data_type == 'orp') {
                 $this->WriteAttributeInteger('orp', $value);
-                $this->WriteAttributeInteger('orp_time', $this->CalculateTime($value_time, 'orp'));
                 $this->WriteAttributeBoolean('orp_is_valid', $is_valid);
             }
             if ($data_type == 'tds') {
                 $this->WriteAttributeInteger('tds', $value);
-                $this->WriteAttributeInteger('tds_time', $this->CalculateTime($value_time, 'tds'));
                 $this->WriteAttributeBoolean('tds_is_valid', $is_valid);
             }
             if ($data_type == 'ph') {
                 $this->WriteAttributeFloat('ph', $value);
-                $this->WriteAttributeInteger('ph_time', $this->CalculateTime($value_time, 'pH'));
                 $this->WriteAttributeBoolean('ph_is_valid', $is_valid);
             }
             if ($data_type == 'battery') {
                 $this->WriteAttributeInteger('battery', $value);
-                $this->WriteAttributeInteger('battery_time', $this->CalculateTime($value_time, 'pH'));
                 $this->WriteAttributeBoolean('battery_is_valid', $is_valid);
             }
             if ($data_type == 'rssi') {
                 $this->WriteAttributeInteger('rssi', $value);
-                $this->WriteAttributeInteger('rssi_time', $this->CalculateTime($value_time, 'pH'));
                 $this->WriteAttributeBoolean('rssi_is_valid', $is_valid);
             }
             $this->SendDebug('Ondilo data', $data_type . ': ' . $value, 0);
@@ -858,12 +827,12 @@ class OndiloDevice extends IPSModule
                 'value' => $this->ReadAttributeBoolean('serial_number_enabled'),
                 'onChange' => 'Ondilo_SetWebFrontVariable($id, "serial_number_enabled", $serial_number_enabled);'],
             [
-                'name' => 'temperature_time_enabled',
+                'name' => 'last_measure_enabled',
                 'type' => 'CheckBox',
-                'caption' => 'temperature time',
+                'caption' => 'last measure',
                 'visible' => true,
-                'value' => $this->ReadAttributeBoolean('temperature_time_enabled'),
-                'onChange' => 'Ondilo_SetWebFrontVariable($id, "temperature_time_enabled", $temperature_time_enabled);'],
+                'value' => $this->ReadAttributeBoolean('last_measure_enabled'),
+                'onChange' => 'Ondilo_SetWebFrontVariable($id, "last_measure_enabled", $last_measure_enabled);'],
             [
                 'name' => 'temperature_is_valid_enabled',
                 'type' => 'CheckBox',
@@ -872,13 +841,6 @@ class OndiloDevice extends IPSModule
                 'value' => $this->ReadAttributeBoolean('temperature_is_valid_enabled'),
                 'onChange' => 'Ondilo_SetWebFrontVariable($id, "temperature_is_valid_enabled", $temperature_is_valid_enabled);'],
             [
-                'name' => 'orp_time_enabled',
-                'type' => 'CheckBox',
-                'caption' => 'orp time',
-                'visible' => true,
-                'value' => $this->ReadAttributeBoolean('orp_time_enabled'),
-                'onChange' => 'Ondilo_SetWebFrontVariable($id, "orp_time_enabled", $orp_time_enabled);'],
-            [
                 'name' => 'orp_is_valid_enabled',
                 'type' => 'CheckBox',
                 'caption' => 'orp is valid',
@@ -886,26 +848,12 @@ class OndiloDevice extends IPSModule
                 'value' => $this->ReadAttributeBoolean('orp_is_valid_enabled'),
                 'onChange' => 'Ondilo_SetWebFrontVariable($id, "orp_is_valid_enabled", $orp_is_valid_enabled);'],
             [
-                'name' => 'tds_time_enabled',
-                'type' => 'CheckBox',
-                'caption' => 'tds time',
-                'visible' => true,
-                'value' => $this->ReadAttributeBoolean('tds_time_enabled'),
-                'onChange' => 'Ondilo_SetWebFrontVariable($id, "tds_time_enabled", $tds_time_enabled);'],
-            [
                 'name' => 'tds_is_valid_enabled',
                 'type' => 'CheckBox',
                 'caption' => 'tds is valid',
                 'visible' => true,
                 'value' => $this->ReadAttributeBoolean('tds_is_valid_enabled'),
                 'onChange' => 'Ondilo_SetWebFrontVariable($id, "tds_is_valid_enabled", $tds_is_valid_enabled);'],
-            [
-                'name' => 'ph_time_enabled',
-                'type' => 'CheckBox',
-                'caption' => 'pH time',
-                'visible' => true,
-                'value' => $this->ReadAttributeBoolean('ph_time_enabled'),
-                'onChange' => 'Ondilo_SetWebFrontVariable($id, "ph_time_enabled", $ph_time_enabled);'],
             [
                 'name' => 'ph_is_valid_enabled',
                 'type' => 'CheckBox',
@@ -928,26 +876,12 @@ class OndiloDevice extends IPSModule
                 'value' => $this->ReadAttributeBoolean('battery_is_valid_enabled'),
                 'onChange' => 'Ondilo_SetWebFrontVariable($id, "battery_is_valid_enabled", $battery_is_valid_enabled);'],
             [
-                'name' => 'battery_time_enabled',
-                'type' => 'CheckBox',
-                'caption' => 'battery time',
-                'visible' => true,
-                'value' => $this->ReadAttributeBoolean('battery_time_enabled'),
-                'onChange' => 'Ondilo_SetWebFrontVariable($id, "battery_time_enabled", $battery_time_enabled);'],
-            [
                 'name' => 'rssi_enabled',
                 'type' => 'CheckBox',
                 'caption' => 'rssi',
                 'visible' => true,
                 'value' => $this->ReadAttributeBoolean('rssi_enabled'),
                 'onChange' => 'Ondilo_SetWebFrontVariable($id, "rssi_enabled", $rssi_enabled);'],
-            [
-                'name' => 'rssi_time_enabled',
-                'type' => 'CheckBox',
-                'caption' => 'rssi time',
-                'visible' => true,
-                'value' => $this->ReadAttributeBoolean('rssi_time_enabled'),
-                'onChange' => 'Ondilo_SetWebFrontVariable($id, "rssi_time_enabled", $rssi_time_enabled);'],
             [
                 'name' => 'rssi_is_valid_enabled',
                 'type' => 'CheckBox',
