@@ -180,8 +180,8 @@ class OndiloDevice extends IPSModule
         );
         $tds_ass = [
             [0, $this->Translate("low"). ' %d', "", 255],
-            [200, '%d', "", 65280],
-            [250, $this->Translate("high") . ' %d', "", 16711680]];
+            [250, '%d', "", 65280],
+            [2000, $this->Translate("high") . ' %d', "", 16711680]];
         $this->RegisterProfileAssociation('Ondilo.TDS', 'Snow', '', ' ppm', 0, 5000, 10, 0, VARIABLETYPE_INTEGER, $tds_ass);
         $this->SetupVariable(
             'tds', $this->Translate('tds'), 'Ondilo.TDS', $this->_getPosition(), VARIABLETYPE_INTEGER, false, true
@@ -212,6 +212,7 @@ class OndiloDevice extends IPSModule
         $this->SetupVariable(
             'battery_is_valid', $this->Translate('battery is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
         );
+        $last_measure_exist = true;
         $obj_lastmeasure = @$this->GetIDForIdent('last_measure');
         if($obj_lastmeasure == false)
         {
