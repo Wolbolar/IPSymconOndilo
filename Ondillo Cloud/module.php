@@ -256,30 +256,38 @@ class OndiloCloud extends IPSModule
                     'method' => 'POST',
                     'content' => http_build_query(['refresh_token' => $this->ReadAttributeString('Token')])]];
             $context = stream_context_create($options);
-            $result = file_get_contents('https://oauth.ipmagic.de/access_token/' . $this->oauthIdentifer, false, $context);
+            $result = @file_get_contents('https://oauth.ipmagic.de/access_token/' . $this->oauthIdentifer, false, $context);
+            if($result != false){
+                $data = json_decode($result);
+                $this->SendDebug('Symcon Connect Data', $result, 0);
+                if (!isset($data->token_type) || $data->token_type != 'Bearer') {
+                    die('Bearer Token expected');
+                }
 
-            $data = json_decode($result);
-            $this->SendDebug('Symcon Connect Data', $result, 0);
-            if (!isset($data->token_type) || $data->token_type != 'Bearer') {
-                die('Bearer Token expected');
-            }
+                //Update parameters to properly cache it in the next step
+                $Token = $data->access_token;
+                $Expires = time() + $data->expires_in;
 
-            //Update parameters to properly cache it in the next step
-            $Token = $data->access_token;
-            $Expires = time() + $data->expires_in;
+                //Update Refresh Token if we received one! (This is optional)
+                if (isset($data->refresh_token)) {
+                    $this->SendDebug('FetchAccessToken', "NEW! Let's save the updated Refresh Token permanently", 0);
 
-            //Update Refresh Token if we received one! (This is optional)
-            if (isset($data->refresh_token)) {
-                $this->SendDebug('FetchAccessToken', "NEW! Let's save the updated Refresh Token permanently", 0);
-
-                $this->WriteAttributeString('Token', $data->refresh_token);
+                    $this->WriteAttributeString('Token', $data->refresh_token);
+                }
             }
         }
+        if($result != false){
+            $this->SendDebug('FetchAccessToken', 'CACHE! New Access Token is valid until ' . date('d.m.y H:i:s', $Expires), 0);
 
-        $this->SendDebug('FetchAccessToken', 'CACHE! New Access Token is valid until ' . date('d.m.y H:i:s', $Expires), 0);
+            //Save current Token
+            $this->SetBuffer('AccessToken', json_encode(['Token' => $Token, 'Expires' => $Expires]));
 
-        //Save current Token
-        $this->SetBuffer('AccessToken', json_encode(['Token' => $Token, 'Expires' => $Expires]));
+        }
+        else{
+            $Token = '';
+            $this->SetBuffer('Could not get Token', 'HTTP request failed!');
+        }
+
 
         //Return current Token
         return $Token;
