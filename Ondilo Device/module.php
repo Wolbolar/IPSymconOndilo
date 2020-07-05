@@ -71,6 +71,8 @@ class OndiloDevice extends IPSModule
         $this->RegisterAttributeBoolean('orp_enabled', false);
         $this->RegisterAttributeBoolean('orp_is_valid', true);
         $this->RegisterAttributeBoolean('orp_is_valid_enabled', false);
+        $this->RegisterAttributeFloat('salt', 0);
+        $this->RegisterAttributeBoolean('salt_enabled', false);
         $this->RegisterAttributeInteger('tds', 0);
         $this->RegisterAttributeBoolean('tds_enabled', false);
         $this->RegisterAttributeBoolean('tds_is_valid', true);
@@ -177,6 +179,14 @@ class OndiloDevice extends IPSModule
         );
         $this->SetupVariable(
             'orp_is_valid', $this->Translate('orp is valid'), 'Ondilo.Valid', $this->_getPosition(), VARIABLETYPE_BOOLEAN, false, false
+        );
+        $salt_ass = [
+            [0, $this->Translate("low"). ' %d', "", 255],
+            [3000, '%d', "", 65280],
+            [5000, $this->Translate("high") . ' %d', "", 16711680]];
+        $this->RegisterProfileAssociation('Ondilo.Salt', 'Snow', '', ' ppm', 0, 10000, 10, 0, VARIABLETYPE_FLOAT, $salt_ass);
+        $this->SetupVariable(
+            'salt', $this->Translate('salt'), 'Ondilo.Salt', $this->_getPosition(), VARIABLETYPE_FLOAT, false, true
         );
         $tds_ass = [
             [0, $this->Translate("low"). ' %d', "", 255],
@@ -316,6 +326,7 @@ class OndiloDevice extends IPSModule
         $this->WriteEnabledValue('temperature_is_valid', VARIABLETYPE_BOOLEAN);
         $this->WriteEnabledValue('orp', VARIABLETYPE_INTEGER, true);
         $this->WriteEnabledValue('orp_is_valid', VARIABLETYPE_BOOLEAN);
+        $this->WriteEnabledValue('salt', VARIABLETYPE_FLOAT, true);
         $this->WriteEnabledValue('tds', VARIABLETYPE_INTEGER, true);
         $this->WriteEnabledValue('tds_is_valid', VARIABLETYPE_BOOLEAN);
         $this->WriteEnabledValue('ph', VARIABLETYPE_FLOAT, true);
@@ -428,32 +439,56 @@ class OndiloDevice extends IPSModule
     public function GetUserUnits()
     {
         $user_units_json = $this->RequestStatus('GetUserUnits');
-        $user_units = json_decode($user_units_json);
+        $user_units = json_decode($user_units_json, true);
         if ($user_units != false) {
-            $conductivity = $user_units->conductivity;
-            $this->SendDebug('Ondilo conductivity', $conductivity, 0);
-            $this->WriteAttributeString('unit_conductivity', $conductivity);
-            $hardness = $user_units->hardness;
-            $this->SendDebug('Ondilo hardness', $hardness, 0);
-            $this->WriteAttributeString('unit_hardness', $hardness);
-            $orp = $user_units->orp;
-            $this->SendDebug('Ondilo orp', $orp, 0);
-            $this->WriteAttributeString('unit_orp', $orp);
-            $pressure = $user_units->pressure;
-            $this->SendDebug('Ondilo pressure', $pressure, 0);
-            $this->WriteAttributeString('unit_pressure', $pressure);
-            $salt = $user_units->salt;
-            $this->SendDebug('Ondilo salt', $salt, 0);
-            $this->WriteAttributeString('unit_salt', $salt);
-            $speed = $user_units->speed;
-            $this->SendDebug('Ondilo speed', $speed, 0);
-            $this->WriteAttributeString('unit_speed', $speed);
-            $temperature = $user_units->temperature;
-            $this->SendDebug('Ondilo temperature', $temperature, 0);
-            $this->WriteAttributeString('unit_temperature', $temperature);
-            $volume = $user_units->volume;
-            $this->SendDebug('Ondilo volume', $volume, 0);
-            $this->WriteAttributeString('unit_volume', $volume);
+            if(isset($user_units['conductivity']))
+            {
+                $conductivity = $user_units['conductivity'];
+                $this->SendDebug('Ondilo conductivity', $conductivity, 0);
+                $this->WriteAttributeString('unit_conductivity', $conductivity);
+            }
+            if(isset($user_units['hardness']))
+            {
+                $hardness = $user_units['hardness'];
+                $this->SendDebug('Ondilo hardness', $hardness, 0);
+                $this->WriteAttributeString('unit_hardness', $hardness);
+            }
+            if(isset($user_units['orp']))
+            {
+                $orp = $user_units['orp'];
+                $this->SendDebug('Ondilo orp', $orp, 0);
+                $this->WriteAttributeString('unit_orp', $orp);
+            }
+            if(isset($user_units['pressure']))
+            {
+                $pressure = $user_units['pressure'];
+                $this->SendDebug('Ondilo pressure', $pressure, 0);
+                $this->WriteAttributeString('unit_pressure', $pressure);
+            }
+            if(isset($user_units['salt']))
+            {
+                $salt = $user_units['salt'];
+                $this->SendDebug('Ondilo salt', $salt, 0);
+                $this->WriteAttributeString('unit_salt', $salt);
+            }
+            if(isset($user_units['speed']))
+            {
+                $speed = $user_units['speed'];
+                $this->SendDebug('Ondilo speed', $speed, 0);
+                $this->WriteAttributeString('unit_speed', $speed);
+            }
+            if(isset($user_units['temperature']))
+            {
+                $temperature = $user_units['temperature'];
+                $this->SendDebug('Ondilo temperature', $temperature, 0);
+                $this->WriteAttributeString('unit_temperature', $temperature);
+            }
+            if(isset($user_units['volume']))
+            {
+                $volume = $user_units['volume'];
+                $this->SendDebug('Ondilo volume', $volume, 0);
+                $this->WriteAttributeString('unit_volume', $volume);
+            }
             $this->WriteAttributeString('user_units', json_encode($user_units));
         }
         return $user_units;
@@ -579,6 +614,9 @@ class OndiloDevice extends IPSModule
             if ($data_type == 'orp') {
                 $this->WriteAttributeInteger('orp', $value);
                 $this->WriteAttributeBoolean('orp_is_valid', $is_valid);
+            }
+            if ($data_type == 'salt') {
+                $this->WriteAttributeFloat('salt', $value);
             }
             if ($data_type == 'tds') {
                 $this->WriteAttributeInteger('tds', $value);
@@ -840,6 +878,13 @@ class OndiloDevice extends IPSModule
                 'visible' => true,
                 'value' => $this->ReadAttributeBoolean('ph_is_valid_enabled'),
                 'onChange' => 'Ondilo_SetWebFrontVariable($id, "ph_is_valid_enabled", $ph_is_valid_enabled);'],
+            [
+                'name' => 'salt_enabled',
+                'type' => 'CheckBox',
+                'caption' => 'salt',
+                'visible' => true,
+                'value' => $this->ReadAttributeBoolean('salt_enabled'),
+                'onChange' => 'Ondilo_SetWebFrontVariable($id, "salt_enabled", $salt_enabled);'],
             [
                 'name' => 'battery_enabled',
                 'type' => 'CheckBox',

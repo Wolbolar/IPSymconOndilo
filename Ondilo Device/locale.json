@@ -36,7 +36,8 @@
       "rssi": "Empfangssignal",
       "rssi time": "rssi Zeit",
       "rssi is valid": "rssi ist gültig",
-      "last measure": "letzte Abfrage"
+      "last measure": "letzte Abfrage",
+      "salt": "Salz"
     },
     "de_AT": {
       "serial number: ": "Seriennummer: ",
@@ -74,7 +75,8 @@
       "rssi": "Empfangssignal",
       "rssi time": "rssi Zeit",
       "rssi is valid": "rssi ist gültig",
-      "last measure": "letzte Abfrage"
+      "last measure": "letzte Abfrage",
+      "salt": "Salz"
     },
     "de_CH": {
       "serial number: ": "Seriennummer: ",
@@ -112,7 +114,8 @@
       "rssi": "Empfangssignal",
       "rssi time": "rssi Zeit",
       "rssi is valid": "rssi ist gültig",
-      "last measure": "letzte Abfrage"
+      "last measure": "letzte Abfrage",
+      "salt": "Salz"
     },
     "fr": {
       "serial number: ": "numéro de série:",
@@ -150,7 +153,8 @@
       "rssi": "Signal reçu",
       "rssi time": "rssi temps",
       "rssi is valid": "rssi est valide",
-      "last measure": "dernière mesure"
+      "last measure": "letzte Abfrage",
+      "salt": "Salz"
     }
   }
 }
