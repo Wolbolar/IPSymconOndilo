@@ -673,7 +673,9 @@ class OndiloCloud extends IPSModule
             [
                 'name' => 'UpdateInterval',
                 'visible' => true,
-                'type' => 'IntervalBox',
+                'type' => 'NumberSpinner',
+                'minimum' => 15,
+                'suffix' => 'minutes',
                 'caption' => 'minutes'
             ]
         ];
