@@ -153,8 +153,8 @@
       "rssi": "Signal reçu",
       "rssi time": "rssi temps",
       "rssi is valid": "rssi est valide",
-      "last measure": "letzte Abfrage",
-      "salt": "Salz"
+      "last measure": "dernière mesure",
+      "salt": "sel"
     }
   }
 }
