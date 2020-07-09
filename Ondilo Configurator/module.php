@@ -42,22 +42,11 @@ class OndiloConfigurator extends IPSModule
 
     public function GetConfiguration()
     {
-        /*
-        $location_id = $this->RequestDataFromParent('location_id');
-        if ($location_id != '') {
-            $snapshot = $this->RequestSnapshot();
-        } else {
-            $locations = $this->RequestLocations();
-            if(!$locations === false)
-            {
-                $snapshot = $this->RequestSnapshot();
-            }
-        }
-        return $snapshot;
-        */
+        $list_pools = $this->RequestDataFromParent('GetListPools');
+        return $list_pools;
     }
 
-    public function RequestDataFromParent(string $endpoint)
+    protected function RequestDataFromParent(string $endpoint)
     {
         $data = $this->SendDataToParent(json_encode([
             'DataID'   => '{58908109-E534-70C0-8A94-8FAABEEBFC6C}',
