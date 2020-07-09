@@ -680,7 +680,7 @@ class OndiloDevice extends IPSModule
             'Type' => 'PUT',
             'Endpoint' => '/api/customer/v1/pools/' . $id . '/recommendations/' . $recommendation_id,
             'id' => $id,
-            'Payload' => ''
+            'Payload' => $recommendation_id
         ]));
         return $result;
     }
