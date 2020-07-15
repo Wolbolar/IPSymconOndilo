@@ -33,6 +33,8 @@ class OndiloCloud extends IPSModule
 
         $this->RegisterPropertyInteger("UpdateInterval", 15);
         $this->RegisterTimer("Update", 0, "ONDILO_Update(" . $this->InstanceID . ");");
+        $this->RegisterPropertyString('webhookusername', 'ipsymcon');
+        $this->RegisterPropertyString('webhookpassword', 'useripsh0me');
         $this->RegisterAttributeString('Token', '');
 
         $this->RegisterAttributeString('user_lastname', '');
@@ -48,9 +50,6 @@ class OndiloCloud extends IPSModule
         $this->RegisterAttributeString('unit_temperature', '');
         $this->RegisterAttributeString('unit_volume', '');
         $this->RegisterAttributeString('list_pools', '[]');
-
-
-
 
         $this->RegisterPropertyInteger("ImportCategoryID", 0);
 
@@ -70,7 +69,7 @@ class OndiloCloud extends IPSModule
         $this->RegisterOAuth($this->oauthIdentifer);
         $ondilo_interval = $this->ReadPropertyInteger('UpdateInterval');
         $this->SetOndiloInterval($ondilo_interval);
-
+        $this->RegisterHook('/hook/ondilo_ico');
         if ($this->ReadAttributeString('Token') == '') {
             $this->SetStatus(IS_INACTIVE);
         } else {
@@ -127,6 +126,109 @@ class OndiloCloud extends IPSModule
         }
         $interval     = $ondilo_interval * 1000  * 60; // minutes
         $this->SetTimerInterval('Update', $interval);
+    }
+
+    private function RegisterHook($WebHook)
+    {
+        $ids = IPS_GetInstanceListByModuleID('{015A6EB8-D6E5-4B93-B496-0D3F77AE9FE1}');
+        if (count($ids) > 0) {
+            $hooks = json_decode(IPS_GetProperty($ids[0], 'Hooks'), true);
+            $found = false;
+            foreach ($hooks as $index => $hook) {
+                if ($hook['Hook'] == $WebHook) {
+                    if ($hook['TargetID'] == $this->InstanceID) {
+                        return;
+                    }
+                    $hooks[$index]['TargetID'] = $this->InstanceID;
+                    $found                     = true;
+                }
+            }
+            if (!$found) {
+                $hooks[] = ['Hook' => $WebHook, 'TargetID' => $this->InstanceID];
+            }
+            IPS_SetProperty($ids[0], 'Hooks', json_encode($hooks));
+            IPS_ApplyChanges($ids[0]);
+        }
+    }
+
+    /**
+     * Löscht einen WebHook, wenn vorhanden.
+     *
+     * @param string $WebHook URI des WebHook.
+     */
+    protected function UnregisterHook($WebHook)
+    {
+        $ids   = IPS_GetInstanceListByModuleID('{015A6EB8-D6E5-4B93-B496-0D3F77AE9FE1}');
+        $index = 0;
+        if (count($ids) > 0) {
+            $hooks = json_decode(IPS_GetProperty($ids[0], 'Hooks'), true);
+            $found = false;
+            foreach ($hooks as $index => $hook) {
+                if ($hook['Hook'] == $WebHook) {
+                    $found = $index;
+                    break;
+                }
+            }
+            if ($found !== false) {
+                array_splice($hooks, $index, 1);
+                IPS_SetProperty($ids[0], 'Hooks', json_encode($hooks));
+                IPS_ApplyChanges($ids[0]);
+            }
+        }
+    }
+
+    /**
+     * This function will be called by the hook control. Visibility should be protected!
+     */
+    protected function ProcessHookData()
+    {
+        $webhookusername = $this->ReadPropertyString('webhookusername');
+        $webhookpassword = $this->ReadPropertyString('webhookpassword');
+        if (!isset($_SERVER['PHP_AUTH_USER'])) {
+            $_SERVER['PHP_AUTH_USER'] = '';
+            $this->SendDebug('Ondilo ICO:', 'Webhook user is empty', 0);
+        }
+        if (isset($_SERVER['PHP_AUTH_USER'])) {
+            $this->SendDebug('Ondilo ICO Recieve:', 'webhook user: ' . $_SERVER['PHP_AUTH_USER'], 0);
+        }
+        if (!isset($_SERVER['PHP_AUTH_PW'])) {
+            $_SERVER['PHP_AUTH_PW'] = '';
+            $this->SendDebug('Ondilo ICO:', 'Webhook password is empty', 0);
+        }
+        if (isset($_SERVER['PHP_AUTH_PW'])) {
+            $this->SendDebug('Ondilo ICO Recieve:', 'webhook password: ' . $_SERVER['PHP_AUTH_PW'], 0);
+        }
+
+        if (($_SERVER['PHP_AUTH_USER'] != $webhookusername) || ($_SERVER['PHP_AUTH_PW'] != $webhookpassword)) {
+            $this->SendDebug('Ondilo ICO:', 'wrong webhook user or password', 0);
+            header('WWW-Authenticate: Basic Realm="Ondilo ICO WebHook"');
+            header('HTTP/1.0 401 Unauthorized');
+            echo 'Authorization required';
+            return;
+        }
+        $request_uri = $_SERVER['REQUEST_URI'];
+        $this->SendDebug('Request URI:', $request_uri, 0);
+        $script_name = substr($_SERVER['SCRIPT_NAME'], strlen("/hook/ondilo_ico"));
+        $this->SendDebug('Request Script Name:', $script_name, 0);
+        $request_type = strpos($script_name, 'validate');
+        if($request_type == 1) // Validate Request
+        {
+            // todo
+            $this->SendDebug('Request Validate Pool ID:', $script_name, 0);
+        }
+        else
+        {
+            echo 'Webhook Ondilo ICO IP-Symcon';
+        }
+
+        //workaround for bug
+        if (!isset($_IPS)) {
+            global $_IPS;
+        }
+        if ($_IPS['SENDER'] == 'Execute') {
+            echo 'This script cannot be used this way.';
+            return;
+        }
     }
 
     public function CheckToken()
@@ -676,7 +778,7 @@ class OndiloCloud extends IPSModule
                 'type' => 'NumberSpinner',
                 'minimum' => 15,
                 'suffix' => 'minutes',
-                'caption' => 'minutes'
+                'caption' => 'Update interval'
             ]
         ];
         return $form;
