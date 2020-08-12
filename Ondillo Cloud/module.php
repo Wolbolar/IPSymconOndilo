@@ -377,20 +377,19 @@ class OndiloCloud extends IPSModule
                     $this->WriteAttributeString('Token', $data->refresh_token);
                 }
             }
+            if($result != false){
+                $this->SendDebug('FetchAccessToken', 'CACHE! New Access Token is valid until ' . date('d.m.y H:i:s', $Expires), 0);
+
+                //Save current Token
+                $this->SetBuffer('AccessToken', json_encode(['Token' => $Token, 'Expires' => $Expires]));
+
+            }
+            else{
+                $Token = '';
+                $this->SetBuffer('Could not get Token', 'HTTP request failed!');
+            }
         }
-        if($result != false){
-            $this->SendDebug('FetchAccessToken', 'CACHE! New Access Token is valid until ' . date('d.m.y H:i:s', $Expires), 0);
-
-            //Save current Token
-            $this->SetBuffer('AccessToken', json_encode(['Token' => $Token, 'Expires' => $Expires]));
-
-        }
-        else{
-            $Token = '';
-            $this->SetBuffer('Could not get Token', 'HTTP request failed!');
-        }
-
-
+        
         //Return current Token
         return $Token;
     }
